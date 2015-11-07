@@ -117,7 +117,7 @@ ifeq ($(TARGET),)
 endif
 
 # valid values for the TARGET
-VLDTARGET := riscos gtk beos amiga amigaos3 framebuffer windows atari cocoa monkey
+VLDTARGET := riscos gtk beos amiga amigaos3 framebuffer windows atari cocoa monkey kolibrios
 
 # Check for valid TARGET
 ifeq ($(filter $(VLDTARGET),$(TARGET)),)
@@ -208,6 +208,10 @@ ifeq ($(TARGET),riscos)
     PKG_CONFIG := $(GCCSDK_INSTALL_ENV)/ro-pkg-config
   endif
 else
+  ifeq ($(TARGET),kolibrios)
+      CC := ~/i586-kos32/kos32/bin/i586-kos32-gcc -I/home/ashish/kolibrios/contrib/sdk/sources/newlib/libc/include -L/home/ashish/kolibrios-libs/built-libs/
+  endif
+
   ifeq ($(TARGET),beos)
     # Building for BeOS/Haiku
     #ifeq ($(HOST),beos)
