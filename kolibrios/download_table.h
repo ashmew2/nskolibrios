@@ -26,11 +26,9 @@ void kolibri_download_done(struct gui_download_window *dw)
 }
 
 
-
-static struct gui_download_table kolibri_download_table {
-    .create = kolibri_create_download_window,
-	.data = kolibri_download_data,
-	.error = kolibri_download_error,
-	.done = kolibri_download_done;
-    };
-
+static struct gui_download_table kolibri_download_table = {
+  .create = kolibri_create_download_window,
+  .data = kolibri_download_data,
+  .error = kolibri_download_error,
+  .done = kolibri_download_done
+};

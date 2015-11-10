@@ -31,8 +31,8 @@ void kolibri_back_state(bool active, void *p)
 
 struct gui_search_table kolibri_gui_search_table = {
    .status = kolibri_status,
-	 .hourglass = kolibri_hourglass,
-	 .add = kolibri_add,
-	 .forward = kolibri_forward,
-	 .back = kolibri_back
+   .hourglass = kolibri_hourglass,
+   .add_recent = kolibri_add_recent,
+   .forward_state = kolibri_forward_state,
+   .back_state = kolibri_back_state
 };

@@ -33,19 +33,10 @@ char *kolibri_find_mimetype_file(const char *ro_path)
 
 }
 
-
 struct gui_fetch_table kolibri_fetch_table = {
-  .filetype = kolibri_get_mimetype_file;
-  .get_resource_url = kolibri_get_resource_url;
-  .get_resource_data = kolibri_get_resource_data;
-  .release_resource_data = kolibri_release_resource_data;
-  .mimetype = kolibri_find_mimetype_file;
+  .filetype = kolibri_get_mimetype_file,
+  .get_resource_url = kolibri_get_resource_url,
+  .get_resource_data = kolibri_get_resource_data,
+  .release_resource_data = kolibri_release_resource_data,
+  .mimetype = kolibri_find_mimetype_file
 };
-
-struct gui_fetch_table kolibri_fetch_table = {
-    .filetype = kolibri_get_mimetype_file,
-    .get_resource_url = kolibri_get_resource_url,
-    .get_resource_data = kolibri_get_resource_data,
-    .release_resource_data = kolibri_release_resource_data,
-    .mimetype = kolibri_find_mimetype_file,
-    };

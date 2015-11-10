@@ -13,7 +13,7 @@ void kolibri_set_clipboard_contents(const char *buffer, size_t length, nsclipboa
 
 }
 
-static struct gui_clipboard_table kolibri_clipboard_table {
+static struct gui_clipboard_table kolibri_clipboard_table = {
   .get = kolibri_get_clipboard_contents,
     .set = kolibri_set_clipboard_contents,
     };
