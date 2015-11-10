@@ -1,4 +1,5 @@
 S_KOLIBRIOS := main.c
+
 S_KOLIBRIOS := $(addprefix kolibrios/,$(S_KOLIBRIOS))
 
 SOURCES = $(S_KOLIBRIOS)

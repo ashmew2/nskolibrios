@@ -15,21 +15,6 @@ struct gui_window {
   struct gui_window *next, *prev;
 };
 
-struct gui_window * kolibri_create_window(struct browser_window *bw, struct gui_window *existing, gui_window_create_flags flags);
-
-void *kolibri_destroy_window(struct gui_window *gw);
-
-void *kolibri_redraw(struct gui_window *g);
-void *kolibri_partial_redraw(struct gui_window *g, const struct rect *rect);
-
-bool kolibri_get_scroll(struct gui_window *g, int *sx, int *sy);
-void kolibri_set_scroll(struct gui_window *g, int sx, int sy);
-
-void kolibri_get_content_dimensions(struct gui_window *g, int *width, int *height, bool scaled);
-
-void kolibri_update_extent(struct gui_window *g);
-void kolibri_reformat_contents(struct gui_window *g); /* Invoke libimg and reformat stuff in the contents area here */
-
 static struct gui_window_table kolibri_window_table = {
     .create = kolibri_create_window,
     .destroy = kolibri_destroy_window,
@@ -59,17 +44,17 @@ struct gui_window * kolibri_create_window(struct browser_window *bw, struct gui_
   return new_tab_window;
 }
 
-void *kolibri_destroy_window(struct gui_window *gw)
+void kolibri_destroy_window(struct gui_window *gw)
 {
   free(gw);
 }
 
-void *kolibri_redraw(struct gui_window *g)
+void kolibri_redraw(struct gui_window *g)
 {
   // SF 12,1
 }
 
-void *kolibri_partial_redraw(struct gui_window *g, const struct rect *rect)
+void kolibri_partial_redraw(struct gui_window *g, const struct rect *rect)
 {
   // SF 12,1 for now
 }

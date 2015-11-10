@@ -209,7 +209,7 @@ ifeq ($(TARGET),riscos)
   endif
 else
   ifeq ($(TARGET),kolibrios)
-      CC := ~/i586-kos32/kos32/bin/i586-kos32-gcc -I/home/ashish/kolibrios/contrib/sdk/sources/newlib/libc/include -L/home/ashish/kolibrios-libs/built-libs/
+      CC := ~/i586-kos32/kos32/bin/i586-kos32-gcc -I/home/ashish/kolibrios/contrib/sdk/sources/newlib/libc/include -I/home/ashish/exp/dllbox/ -L/home/ashish/kolibrios-libs/built-libs/
   endif
 
   ifeq ($(TARGET),beos)
