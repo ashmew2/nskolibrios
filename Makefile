@@ -210,6 +210,7 @@ ifeq ($(TARGET),riscos)
 else
   ifeq ($(TARGET),kolibrios)
       CC := ~/i586-kos32/kos32/bin/i586-kos32-gcc -I/home/ashish/kolibrios/contrib/sdk/sources/newlib/libc/include -I/home/ashish/exp/dllbox/ -L/home/ashish/kolibrios-libs/built-libs/
+      FASM := fasm
   endif
 
   ifeq ($(TARGET),beos)
@@ -635,10 +636,16 @@ endif
 
 OBJECTS := $(sort $(addprefix $(OBJROOT)/,$(subst /,_,$(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(patsubst %.m,%.o,$(patsubst %.s,%.o,$(SOURCES))))))))
 
+ifeq ($(TARGET),kolibrios)
+	OBJECTS += kolibrios/loadboxlib.obj
+endif
+
 $(EXETARGET): $(OBJECTS) $(RESOURCES) $(MESSAGES)
 	$(VQ)echo "    LINK: $(EXETARGET)"
+
 ifneq ($(TARGET)$(SUBTARGET),riscos-elf)
-	$(Q)$(CC) -o $(EXETARGET) $(OBJECTS) $(LDFLAGS)
+
+	$(Q)$(CC) -o $(EXETARGET) $(OBJECTS) loadboxlib.obj $(LDFLAGS)
 else
 	$(Q)$(CXX) -o $(EXETARGET:,ff8=,e1f) $(OBJECTS) $(LDFLAGS)
 	$(Q)$(ELF2AIF) $(EXETARGET:,ff8=,e1f) $(EXETARGET)
