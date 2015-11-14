@@ -39,7 +39,6 @@ nserror kolibri_invalidate(struct nsurl *url)
 }
 
 
-
 struct gui_llcache_table kolibri_gui_llcache_table = {
 	.initialise = kolibri_initialise,
 	.finalise = kolibri_finalise,

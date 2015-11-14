@@ -636,16 +636,11 @@ endif
 
 OBJECTS := $(sort $(addprefix $(OBJROOT)/,$(subst /,_,$(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(patsubst %.m,%.o,$(patsubst %.s,%.o,$(SOURCES))))))))
 
-ifeq ($(TARGET),kolibrios)
-	OBJECTS += kolibrios/loadboxlib.obj
-endif
-
 $(EXETARGET): $(OBJECTS) $(RESOURCES) $(MESSAGES)
 	$(VQ)echo "    LINK: $(EXETARGET)"
 
 ifneq ($(TARGET)$(SUBTARGET),riscos-elf)
-
-	$(Q)$(CC) -o $(EXETARGET) $(OBJECTS) loadboxlib.obj $(LDFLAGS)
+	$(Q)$(CC) -o $(EXETARGET) $(OBJECTS) kolibrios/loadboxlib.obj $(LDFLAGS)
 else
 	$(Q)$(CXX) -o $(EXETARGET:,ff8=,e1f) $(OBJECTS) $(LDFLAGS)
 	$(Q)$(ELF2AIF) $(EXETARGET:,ff8=,e1f) $(EXETARGET)

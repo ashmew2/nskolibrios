@@ -8,7 +8,7 @@ struct gui_download_window *kolibri_create_download_window(struct download_conte
 }
 
 
-nserror kolibri_download_data(struct gui_download_window *dw,	const char *data, unsigned int size)
+nserror kolibri_download_data(struct gui_download_window *dw, const char *data, unsigned int size)
 {
 
 }
