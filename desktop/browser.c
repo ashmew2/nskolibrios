@@ -53,7 +53,7 @@
 #include "render/form_internal.h"
 #include "render/html.h"
 #include "render/box.h"
-#include "curl/curl.h"
+#include "kolibrios/kolibri_http.h"
 #include "css/utils.h"
 #include "javascript/js.h"
 

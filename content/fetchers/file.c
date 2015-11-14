@@ -40,6 +40,7 @@
 #include <limits.h>
 #include <stdarg.h>
 
+#undef HAVE_MMAP
 #ifdef HAVE_MMAP
 #include <sys/mman.h>
 #endif

@@ -209,7 +209,7 @@ ifeq ($(TARGET),riscos)
   endif
 else
   ifeq ($(TARGET),kolibrios)
-      CC := ~/i586-kos32/kos32/bin/i586-kos32-gcc -I/home/ashish/kolibrios/contrib/sdk/sources/newlib/libc/include -I/home/ashish/exp/dllbox/ -L/home/ashish/kolibrios-libs/built-libs/
+      CC := ~/i586-kos32/kos32/bin/i586-kos32-gcc
       FASM := fasm
   endif
 
@@ -640,7 +640,8 @@ $(EXETARGET): $(OBJECTS) $(RESOURCES) $(MESSAGES)
 	$(VQ)echo "    LINK: $(EXETARGET)"
 
 ifneq ($(TARGET)$(SUBTARGET),riscos-elf)
-	$(Q)$(CC) -o $(EXETARGET) $(OBJECTS) kolibrios/loadboxlib.obj $(LDFLAGS)
+	$(VQ)echo "    FUCK THIS SHIT: $(EXETARGET)"
+	$(Q)$(CC) -o $(EXETARGET) -L/home/ashish/kolibrios-libs/built-libs/ -L/home/ashish/dev-netsurf/workspace/inst-i686-linux-gnu/lib $(LDFLAGS) $(OBJECTS) kolibrios/loadboxlib.obj
 else
 	$(Q)$(CXX) -o $(EXETARGET:,ff8=,e1f) $(OBJECTS) $(LDFLAGS)
 	$(Q)$(ELF2AIF) $(EXETARGET:,ff8=,e1f) $(EXETARGET)
@@ -735,6 +736,7 @@ endef
 else
 define compile_target_c
 $$(DEPROOT)/$(3) $$(OBJROOT)/$(2): $$(OBJROOT)/created
+	$$(VQ)echo " FUCK: $(1)"
 	$$(VQ)echo " COMPILE: $(1)"
 	$$(Q)$$(RM) $$(DEPROOT)/$(3)
 	$$(Q)$$(RM) $$(OBJROOT)/$(2)

@@ -95,7 +95,7 @@
 #include <string.h>
 #include <strings.h>
 #include <time.h>
-#include <curl/curl.h>
+#include "content/fetchers/http_kolibri.h"
 
 #include "utils/nsoption.h"
 #include "utils/log.h"
@@ -535,6 +535,7 @@ static bool urldb__host_is_ip_address(const char *host)
 	size_t host_len = strlen(host);
 	const char *sane_host;
 	const char *slash;
+#define NO_IPV6
 #ifndef NO_IPV6
 	struct in6_addr ipv6;
 	char ipv6_addr[64];
@@ -1590,7 +1591,7 @@ static bool urldb_parse_avpair(struct cookie_internal_data *c, char *n,
 				datenoday++)
 			; /* do nothing */
 
-		expires = curl_getdate(datenoday, NULL);
+		expires = kolibri_getdate(datenoday);
 		if (expires == -1) {
 			/* assume we have an unrepresentable
 			 * date => force it to the maximum

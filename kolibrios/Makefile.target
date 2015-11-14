@@ -6,30 +6,32 @@ NETSURF_FEATURE_PNG_CFLAGS := -DWITH_PNG
 NETSURF_FEATURE_JS_CFLAGS := -DWITH_JS -DJS_HAS_FILE_OBJECT=0
 NETSURF_FEATURE_MOZJS_CFLAGS := -DWITH_MOZJS -DJS_HAS_FILE_OBJECT=0
 
-CWARNFLAGS += -Werror
+CWARNFLAGS += -Wno-error
 
-CFLAGS += -std=c99 \
-	  -Dkolibrios -Dnskolibrios -g \
+CFLAGS += -I~/i586-kos32/kos32/i586-kos32/include/ -I/home/ashish/exp/dllbox/ \
+       	  -std=c99 -Dkolibrios -Dnskolibrios -g \
 	  -D_BSD_SOURCE \
 	  -D_DEFAULT_SOURCE \
 	  -D_XOPEN_SOURCE=700 \
 	  -D_POSIX_C_SOURCE=200809L \
 	  -D_NETBSD_SOURCE
-	  -DKOLIBRIOS_RESPATH=\"$(KOLIBRIOS_MONKEY_RESOURCES)\"
+	  -DKOLIBRIOS_RESPATH=\"$(NETSURF_KOLIBRIOS_RESOURCES)\"
 
-LDFLAGS += -lm
+#LDFLAGS += -L/home/ashish/kolibrios-libs/built-libs/ \
+#	-L/home/ashish/dev-netsurf/workspace/inst-i686-linux-gnu/lib \
+#	-lwapcaplet
 
 # non optional pkg-configed libs
-$(eval $(call pkg_config_find_and_add,libcurl,Curl ))
-$(eval $(call pkg_config_find_and_add,openssl,OpenSSL))
-$(eval $(call pkg_config_find_and_add,glib-2.0,GLib2))
+#$(eval $(call pkg_config_find_and_add,libcurl,Curl ))
+#$(eval $(call pkg_config_find_and_add,openssl,OpenSSL))
+#$(eval $(call pkg_config_find_and_add,glib-2.0,GLib2))
 
 # optional pkg-config configured libraries
 $(eval $(call pkg_config_find_and_add_enabled,NSSVG,libsvgtiny,SVG))
 $(eval $(call pkg_config_find_and_add_enabled,ROSPRITE,librosprite,Sprite))
 $(eval $(call pkg_config_find_and_add_enabled,BMP,libnsbmp,BMP))
 $(eval $(call pkg_config_find_and_add_enabled,GIF,libnsgif,GIF))
-$(eval $(call pkg_config_find_and_add_enabled,PNG,libpng,PNG  ))
+#$(eval $(call pkg_config_find_and_add_enabled,PNG,libpng,PNG  ))
 $(eval $(call pkg_config_find_and_add_enabled,MOZJS,mozjs185,JavaScript))
 $(eval $(call pkg_config_find_and_add_enabled,JS,mozilla-js,JavaScript))
 

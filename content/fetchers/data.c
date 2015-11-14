@@ -25,7 +25,7 @@
 #include <strings.h>
 #include <time.h>
 
-#include <curl/curl.h>		/* for URL unescaping functions */
+#include "kolibrios/kolibri_http.h"		/* for URL unescaping functions */
 
 #include <libwapcaplet/libwapcaplet.h>
 
@@ -33,6 +33,7 @@
 #include "content/fetch.h"
 #include "content/fetchers.h"
 #include "content/fetchers/data.h"
+#include "content/fetchers/http_kolibri.h"
 #include "content/urldb.h"
 #include "utils/corestrings.h"
 #include "utils/nsoption.h"
@@ -58,12 +59,12 @@ struct fetch_data_context {
 
 static struct fetch_data_context *ring = NULL;
 
-static CURL *curl;
+static struct http_kolibri_handle *khttp_handle;
 
 static bool fetch_data_initialise(lwc_string *scheme)
 {
 	LOG("fetch_data_initialise called for %s", lwc_string_data(scheme));
-	if ( (curl = curl_easy_init()) == NULL)
+	if ( (khttp_handle = http_kolibri_handle_init()) == NULL)
 		return false;
 	else
 		return true;
@@ -72,7 +73,7 @@ static bool fetch_data_initialise(lwc_string *scheme)
 static void fetch_data_finalise(lwc_string *scheme)
 {
 	LOG("fetch_data_finalise called for %s", lwc_string_data(scheme));
-	curl_easy_cleanup(curl);
+	http_kolibri_handle_cleanup(khttp_handle);
 }
 
 static bool fetch_data_can_fetch(const nsurl *url)
@@ -201,7 +202,9 @@ static bool fetch_data_process(struct fetch_data_context *c)
 	/* URL unescape the data first, just incase some insane page
 	 * decides to nest URL and base64 encoding.  Like, say, Acid2.
 	 */
-        unescaped = curl_easy_unescape(curl, comma + 1, 0, &unescaped_len);
+	unescaped = http_unescape_asm(comma+1, strlen(comma+1));
+	unescaped_len = strlen(unescaped);
+        /*unescaped = curl_easy_unescape(curl, comma + 1, 0, &unescaped_len);*/
         if (unescaped == NULL) {
 		msg.type = FETCH_ERROR;
 		msg.data.error = "Unable to URL decode data: URL";
@@ -215,7 +218,7 @@ static bool fetch_data_process(struct fetch_data_context *c)
 			msg.type = FETCH_ERROR;
 			msg.data.error = "Unable to Base64 decode data: URL";
 			fetch_data_send_callback(&msg, c);
-			curl_free(unescaped);
+			http_kolibri_handle_free(unescaped);
 			return false;
 		}
 	} else {
@@ -225,14 +228,14 @@ static bool fetch_data_process(struct fetch_data_context *c)
 			msg.data.error =
 				"Unable to allocate memory for data: URL";
 			fetch_data_send_callback(&msg, c);
-			curl_free(unescaped);
+			free(unescaped);
 			return false;
 		}
 		c->datalen = unescaped_len;
 		memcpy(c->data, unescaped, unescaped_len);
 	}
 	
-	curl_free(unescaped);
+	free(unescaped);
 	
 	return true;
 }

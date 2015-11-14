@@ -37,7 +37,7 @@
 #include <strings.h>
 #include <inttypes.h>
 
-#include <curl/curl.h>
+
 #include <nsutils/time.h>
 
 #include "utils/config.h"
@@ -52,6 +52,7 @@
 #include "desktop/gui_internal.h"
 
 #include "content/fetch.h"
+#include "content/fetchers/http_kolibri.h"
 #include "content/backing_store.h"
 #include "content/urldb.h"
 
@@ -606,14 +607,14 @@ static nserror llcache_fetch_parse_header(llcache_object *object,
 
 	if (5 < len && strcasecmp(*name, "Date") == 0) {
 		/* extract Date header */
-		object->cache.date = curl_getdate(*value, NULL);
+		object->cache.date = kolibri_getdate(*value);
 	} else if (4 < len && strcasecmp(*name, "Age") == 0) {
 		/* extract Age header */
 		if ('0' <= **value && **value <= '9')
 			object->cache.age = atoi(*value);
 	} else if (8 < len && strcasecmp(*name, "Expires") == 0) {
 		/* extract Expires header */
-		object->cache.expires = curl_getdate(*value, NULL);
+		object->cache.expires = kolibri_getdate(*value);
 	} else if (14 < len && strcasecmp(*name, "Cache-Control") == 0) {
 		/* extract and parse Cache-Control header */
 		const char *start = *value;
@@ -666,7 +667,7 @@ static nserror llcache_fetch_parse_header(llcache_object *object,
 		}
 	} else if (14 < len && strcasecmp(*name, "Last-Modified") == 0) {
 		/* extract Last-Modified header */
-		object->cache.last_modified = curl_getdate(*value, NULL);
+		object->cache.last_modified = kolibri_getdate(*value);
 	}
 
 #undef SKIP_ST

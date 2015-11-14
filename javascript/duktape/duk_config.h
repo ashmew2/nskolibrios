@@ -566,7 +566,7 @@ static __inline__ unsigned long long duk_rdtsc(void) {
 #if defined(DUK_F_BCC)
 /* no endian.h */
 #else
-#include <endian.h>
+#include <machine/endian.h>
 #endif  /* DUK_F_BCC */
 #include <limits.h>
 #include <sys/param.h>

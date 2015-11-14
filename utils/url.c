@@ -24,7 +24,7 @@
 
 #include <ctype.h>
 #include <string.h>
-#include <curl/curl.h>
+#include "kolibrios/kolibri_http.h"
 
 #include "utils/config.h"
 #include "utils/log.h"
@@ -38,13 +38,13 @@ nserror url_unescape(const char *str, char **result)
 	char *curlstr;
 	char *retstr;
 
-	curlstr = curl_unescape(str, 0);
+	curlstr = http_unescape_asm(str, strlen(str));
 	if (curlstr == NULL) {
 		return NSERROR_NOMEM;
 	}
 
 	retstr = strdup(curlstr);
-	curl_free(curlstr);
+	free(curlstr);
 
 	if (retstr == NULL) {
 		return NSERROR_NOMEM;

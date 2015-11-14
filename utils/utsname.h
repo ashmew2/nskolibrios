@@ -23,7 +23,7 @@
 
 #ifndef _NETSURF_UTILS_UTSNAME_H_
 #define _NETSURF_UTILS_UTSNAME_H_
-
+#undef HAVE_UTSNAME
 #ifdef HAVE_UTSNAME
 #include <sys/utsname.h>
 #else

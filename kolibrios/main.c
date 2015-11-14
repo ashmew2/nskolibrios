@@ -1,8 +1,8 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include "kolibri_debug.h"
-#include "kolibri_gui.h"
+#include "kolibrios/kolibri_debug.h"
+#include "kolibrios/kolibri_gui.h"
 
 #include "utils/errors.h"
 

@@ -38,7 +38,6 @@
 #include <strings.h>
 #include <time.h>
 #include <libwapcaplet/libwapcaplet.h>
-#include <curl/curl.h>
 
 #include "utils/config.h"
 #include "utils/corestrings.h"
@@ -55,7 +54,7 @@
 #include "content/fetchers.h"
 #include "content/fetchers/resource.h"
 #include "content/fetchers/about.h"
-#include "content/fetchers/curl.h"
+#include "content/fetchers/http_kolibri.h"
 #include "content/fetchers/data.h"
 #include "content/fetchers/file.h"
 #include "javascript/fetcher.h"
@@ -290,7 +289,7 @@ nserror fetcher_init(void)
 {
 	nserror ret;
 
-	ret = fetch_curl_register();
+	ret = fetch_http_kolibri_register();
 	if (ret != NSERROR_OK) {
 		return ret;
 	}
@@ -385,7 +384,7 @@ nserror fetcher_fdset(fd_set *read_fd_set,
 		      fd_set *except_fd_set,
 		      int *maxfd_out)
 {
-	CURLMcode code;
+	int code;
 	int maxfd;
 	int fetcherd; /* fetcher index */
 
@@ -407,12 +406,12 @@ nserror fetcher_fdset(fd_set *read_fd_set,
 	FD_ZERO(read_fd_set);
 	FD_ZERO(write_fd_set);
 	FD_ZERO(except_fd_set);
-	code = curl_multi_fdset(fetch_curl_multi,
+	code = http_kolibri_multi_fdset(fetch_http_kolibri_multi,
 				read_fd_set,
 				write_fd_set,
 				except_fd_set,
 				&maxfd);
-	assert(code == CURLM_OK);
+	assert(code == 0);
 
 	if (maxfd >= 0) {
 		/* change the scheduled poll to happen is a 1000ms as
