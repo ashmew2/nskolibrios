@@ -369,6 +369,7 @@ endef
 # 6: Parameters to add to LDFLAGS when disabled
 define feature_switch
   ifeq ($$(NETSURF_USE_$(1)),YES)
+$(warning BUILDING FEATURE $(1))
     CFLAGS += $(3)
     CXXFLAGS += $(3)
     LDFLAGS += $(4)
@@ -376,6 +377,7 @@ define feature_switch
       $$(info M.CONFIG: $(2)	enabled       (NETSURF_USE_$(1) := YES))
     endif
   else ifeq ($$(NETSURF_USE_$(1)),NO)
+$(warning NOT BUILDING FEATURE $(1))
     CFLAGS += $(5)
     CXXFLAGS += $(5)
     LDFLAGS += $(6)
@@ -502,7 +504,7 @@ include Makefile.defaults
 # libraries enabled by feature switch without pkgconfig file 
 $(eval $(call feature_switch,JPEG,JPEG (libjpeg),-DWITH_JPEG,-ljpeg,-UWITH_JPEG,))
 $(eval $(call feature_switch,HARU_PDF,PDF export (haru),-DWITH_PDF_EXPORT,-lhpdf -lpng,-UWITH_PDF_EXPORT,))
-$(eval $(call feature_switch,LIBICONV_PLUG,glibc internal iconv,-DLIBICONV_PLUG,,-ULIBICONV_PLUG,-liconv))
+#$(eval $(call feature_switch,LIBICONV_PLUG,glibc internal iconv,-DLIBICONV_PLUG,,-ULIBICONV_PLUG,-liconv))
 $(eval $(call feature_switch,DUKTAPE,Javascript (Duktape),,,,,))
 
 # Common libraries with pkgconfig
@@ -640,8 +642,8 @@ $(EXETARGET): $(OBJECTS) $(RESOURCES) $(MESSAGES)
 	$(VQ)echo "    LINK: $(EXETARGET)"
 
 ifneq ($(TARGET)$(SUBTARGET),riscos-elf)
-	$(VQ)echo "    FUCK THIS SHIT: $(EXETARGET)"
-	$(Q)$(CC) -o $(EXETARGET) -L/home/ashish/kolibrios-libs/built-libs/ -L/home/ashish/dev-netsurf/workspace/inst-i686-linux-gnu/lib $(LDFLAGS) $(OBJECTS) kolibrios/loadboxlib.obj
+	$(VQ)echo "    FUCK THIS SHIT: $(LDFLAGS)"
+	$(Q)$(CC) -o $(EXETARGET) $(LDFLAGS) $(OBJECTS) kolibrios/loadboxlib.obj
 else
 	$(Q)$(CXX) -o $(EXETARGET:,ff8=,e1f) $(OBJECTS) $(LDFLAGS)
 	$(Q)$(ELF2AIF) $(EXETARGET:,ff8=,e1f) $(EXETARGET)

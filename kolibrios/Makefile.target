@@ -17,7 +17,7 @@ CFLAGS += -I~/i586-kos32/kos32/i586-kos32/include/ -I/home/ashish/exp/dllbox/ \
 	  -D_NETBSD_SOURCE
 	  -DKOLIBRIOS_RESPATH=\"$(NETSURF_KOLIBRIOS_RESOURCES)\"
 
-#LDFLAGS += -L/home/ashish/kolibrios-libs/built-libs/ \
+LDFLAGS += -L/home/ashish/kolibrios-libs/built-libs/ 
 #	-L/home/ashish/dev-netsurf/workspace/inst-i686-linux-gnu/lib \
 #	-lwapcaplet
 
@@ -35,7 +35,7 @@ $(eval $(call pkg_config_find_and_add_enabled,GIF,libnsgif,GIF))
 $(eval $(call pkg_config_find_and_add_enabled,MOZJS,mozjs185,JavaScript))
 $(eval $(call pkg_config_find_and_add_enabled,JS,mozilla-js,JavaScript))
 
-S_KOLIBRIOS := main.c
+S_KOLIBRIOS := main.c kolibri_misc.c
 
 S_KOLIBRIOS := $(addprefix kolibrios/,$(S_KOLIBRIOS))
 
