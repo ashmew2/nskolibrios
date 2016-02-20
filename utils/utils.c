@@ -490,16 +490,16 @@ char *strchrnul (const char *s, int c_in)
 }
 
 #endif
-
+#undef HAVE_UTSNAME
 #ifndef HAVE_UTSNAME
 #include "utils/utsname.h"
 
 int uname(struct utsname *buf) {
-	strcpy(buf->sysname,"windows");
+	strcpy(buf->sysname,"kolibrios");
 	strcpy(buf->nodename,"nodename");
-	strcpy(buf->release,"release");
-	strcpy(buf->version,"version");
-	strcpy(buf->machine,"pc");
+	strcpy(buf->release,"pre-release");
+	strcpy(buf->version,"alpha-version");
+	strcpy(buf->machine,"i386-pc");
 	
 	return 0;
 }
