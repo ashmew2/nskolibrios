@@ -1,7 +1,8 @@
 #ifndef HTTP_KOLIBRI_H
 #define HTTP_KOLIBRI_H
 
-#include <sys/select.h>
+/*We don't have a sys/select.h header */
+/*#include <sys/select.h>*/
 #include <time.h>
 
 #include "utils/errors.h"
