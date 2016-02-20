@@ -11,7 +11,7 @@ PREREQUISITES for the make step are:
 
 Compiler is set up at /home/autobuild/tools/win32/bin/kos32-gcc
 Kolibrios SVN sources are at $HOME/kolibrios
-
+maker.sh is the build script for Building Netsurf required libraries.
 
 
 
