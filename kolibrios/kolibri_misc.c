@@ -1,4 +1,5 @@
 #include "desktop/font.h"
+#include <time.h>
 
 void warn_user(const char *warning, const char *detail)
 {
@@ -27,3 +28,15 @@ const struct font_functions nsfont = {
 	kolibrios_font_position_in_string,
 	kolibrios_font_split
 };
+
+int inet_aton(const char *cp, struct in_addr *inp) {
+
+}
+
+char *strptime(const char *s, const char *format, struct tm *tm) {
+
+}
+
+int atexit(void (*function)(void)) {
+
+}
