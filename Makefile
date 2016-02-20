@@ -209,7 +209,7 @@ ifeq ($(TARGET),riscos)
   endif
 else
   ifeq ($(TARGET),kolibrios)
-      CC := ~/i586-kos32/kos32/bin/i586-kos32-gcc
+      CC := /home/autobuild/tools/win32/bin/kos32-gcc
       FASM := fasm
   endif
 
