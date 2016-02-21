@@ -73,7 +73,15 @@ int inet_aton(const char *cp, struct in_addr *inp);
 
 #include<sys/types.h>
 
+/* These FD_SET functions need to be replaced.
+   Just kept here so that we can compile the program, 
+   but we will need replacements for these. */
+
 typedef unsigned int fd_set;
+
+/*The definition of this function is put in content/fetch.c for now */
+
+void FD_ZERO(fd_set *fdsetxyz);
 
 typedef unsigned int in_addr_t;
 
