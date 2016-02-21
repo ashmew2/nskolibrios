@@ -378,6 +378,9 @@ fetcher_add(lwc_string *scheme, const struct fetcher_operation_table *ops)
 	return NSERROR_OK;
 }
 
+void FD_ZERO(fd_set *read_fd_set) { }
+
+
 /* exported interface documented in content/fetch.h */
 nserror fetcher_fdset(fd_set *read_fd_set,
 		      fd_set *write_fd_set,
