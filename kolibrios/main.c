@@ -41,9 +41,10 @@ int main(int argc, char** argv)
       nserror ret;
       /*Also makes sense to have a kolibri_init_libraries(); here which inits all the libraries we'll need */
 
-      /* Need to handle the cookie jar somehow */
+    /* Need to handle the cookie jar somehow */
     /* First off, get the frontend connected with render engine of NS */
-
+    debug_board_write_str("Netsurf: Official port for KolibriOS.\n");
+      
     struct netsurf_table nskolibri_table = {
 	/* Tables in Use */
 	.browser = &kolibri_browser_table,
@@ -66,6 +67,8 @@ int main(int argc, char** argv)
       debug_board_write_str("NSERROR IS OK!\n\n\n");
     else
       debug_board_write_str("NSERROR -> FAILED TO INIT\n\n");
+
+    debug_board_write_str("Good Bye. See you Soon!.\n");
 
     return 0;
     }
