@@ -42,7 +42,7 @@ $(eval $(call pkg_config_find_and_add_enabled,GIF,libnsgif,GIF))
 $(eval $(call pkg_config_find_and_add_enabled,MOZJS,mozjs185,JavaScript))
 $(eval $(call pkg_config_find_and_add_enabled,JS,mozilla-js,JavaScript))
 
-S_KOLIBRIOS := main.c kolibri_misc.c kolibri_debug.c kolibri_filesystem.c kolibri_iconv.c kolibri_regex.c 
+S_KOLIBRIOS := main.c kolibri_misc.c kolibri_debug.c kolibri_filesystem.c kolibri_iconv.c kolibri_regex.c kolibri_pefixer.c
 
 S_KOLIBRIOS := $(addprefix kolibrios/,$(S_KOLIBRIOS))
 
