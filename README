@@ -17,7 +17,11 @@ Compiler is set up at /home/autobuild/tools/win32/bin/kos32-gcc
 Kolibrios SVN sources are at $HOME/kolibrios
 maker.sh is the build script for Building Netsurf required libraries.
 zlib has been compiled from contrib/sdk/sources/zlib and the libz.a file placed at /home/autobuild/tools/win32/lib
+
+After that: Simply run builder.sh from this directory. It will compile your stuff.
 --------------------------------------------
+
+This is the longer version (You dont need it with builder.sh):
 
 $ make TARGET=kolibrios
 
@@ -25,7 +29,7 @@ After this step is done, you will many linker errors. But that is just because o
 So now, you need to
 
 cd build-i686-linux/
-kos32-ld -L/home/autobuild/tools/win32/mingw32/lib *.o ~/ofiles/*.o -lc -lapp -lgcc -o netsurf
+kos32-ld -L/home/autobuild/tools/win32/mingw32/lib *.o ~/ofiles/*.o -lz -lc -lapp -lgcc -o netsurf
 
 #This should get you a netsurf executable.
 
