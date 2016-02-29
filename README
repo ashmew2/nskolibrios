@@ -3,11 +3,14 @@ Welcome to the Official KolibriOS port for Netsurf!
 
 This is a work under progress.
 
+If you have an executable, you can skip to the "Running the binary on KolibriOS" section below.
+-----------------------------------------------------------------------------------------------
+
 In order to compile this, you need to first build all libraries using the maker.sh script on your machine.
 Once that is done, You need to build netsurf with the builder.sh script.
 
-PREREQUISITES
--------------
+PREREQUISITES FOR COMPILING
+---------------------------
 kos32-gcc Compiler is set up at /home/autobuild/tools/win32/bin/kos32-gcc
 
 Set up your path to contain /home/autobuild/tools/win32/bin/
@@ -19,11 +22,39 @@ maker.sh is the build script for Building Netsurf required libraries.
 zlib has been compiled from contrib/sdk/sources/zlib and the libz.a file placed at /home/autobuild/tools/win32/lib
 
 libc.dll.a and libapp.a and libiberty.a have been compiled from $HOME/kolibrios/contrib/sdk/sources/newlib/libc and copied to /home/autobuild/tools/win32/lib
---
-
-INSTALL
--------
 
 After that: Simply run builder.sh from this directory. It will compile your stuff.
-
 ----------------------------------------------------------------------------------
+
+Running the binary on KolibriOS
+===============================
+
+Copy the executable nsbin into a directory.
+
+Set up the kolibrios/ directory as this is required for running libc 
+applications like Netsurf.
+
+
+CleverMouse said "You have probably not configured the folder /kolibrios. In order to do 
+this, copy the folder /kolibrios and the file kolibri.lbl from the 
+distribution kit to the root of some partition accessible from 
+KolibriOS, so that /hdX/Y/kolibri.lbl and /hdX/Y/kolibrios/, or 
+/usbhdX/Y/kolibri.lbl and /usbhdX/Y/kolibrios/ are accessible from 
+KolibriOS. And yes, this is a sacred knowledge not present in the 
+documentation." - http://board.kolibrios.org/viewtopic.php?f=23&t=2865&p=58495&hilit=.lbl#p58495
+
+Once you have tset up these directories, you can execute KolibriOS and 
+run the nsbin executable.
+
+I usually use this as the command to run my qemu instance of Kolibri:
+
+qemu-system-x86_64 -L . -m 128 -fda ~/Downloads/kolibri.img -boot a -localtime -vga vmware -net nic,model=rtl8139 -net user -soundhw ac97 -usb -usbdevice disk:format=raw:fat:/home/bob/dev-netsurf/workspace/netsurf/ -usbdevice tablet -usbdevice disk:format=raw:fat:/home/bob/kosmount/ &
+
+
+If You have any problems, please contact :
+
+ashmew2@gmail.com
+OR post to the Official Netsurf thread: http://board.kolibrios.org/viewtopic.php?f=40&t=2315&start=150
+OR Send a PM to ashmew2 on board.kolibrios.org
+
+Have FUN!
