@@ -1,86 +1,29 @@
-Welcome to the KolibriOS port for Netsurf!
+Welcome to the Official KolibriOS port for Netsurf!
+---------------------------------------------------
 
 This is a work under progress.
 
 In order to compile this, you need to first build all libraries using the maker.sh script on your machine.
-Once that is done, You need to build netsurf with
+Once that is done, You need to build netsurf with the builder.sh script.
 
---------------------------------------------
-Set up the C cross compiler (Mingw32 based) first.
+PREREQUISITES
+-------------
+kos32-gcc Compiler is set up at /home/autobuild/tools/win32/bin/kos32-gcc
 
-This requires you to place the cross compiler into /home/autobuild/
---------------------------------------------
+Set up your path to contain /home/autobuild/tools/win32/bin/
 
-PREREQUISITES for the make step are:
-
-Compiler is set up at /home/autobuild/tools/win32/bin/kos32-gcc
 Kolibrios SVN sources are at $HOME/kolibrios
+
 maker.sh is the build script for Building Netsurf required libraries.
+
 zlib has been compiled from contrib/sdk/sources/zlib and the libz.a file placed at /home/autobuild/tools/win32/lib
 
+libc.dll.a and libapp.a and libiberty.a have been compiled from $HOME/kolibrios/contrib/sdk/sources/newlib/libc and copied to /home/autobuild/tools/win32/lib
+--
+
+INSTALL
+-------
+
 After that: Simply run builder.sh from this directory. It will compile your stuff.
---------------------------------------------
 
-This is the longer version (You dont need it with builder.sh):
-
-$ make TARGET=kolibrios
-
-After this step is done, you will many linker errors. But that is just because our compiler cannot handle that correctly yet.
-So now, you need to
-
-cd build-i686-linux/
-kos32-ld -L/home/autobuild/tools/win32/mingw32/lib *.o ~/ofiles/*.o -lz -lc -lapp -lgcc -o netsurf
-
-#This should get you a netsurf executable.
-
----------------------------------------------------
-
-
-
-
-
-
-
-Default netsurf Readme:
------------------------
-
---------------------------------------------------------------------------------
-  NetSurf README
---------------------------------------------------------------------------------
-
-  This document should help point you at various useful bits of information.
-
-
-  Building NetSurf
-==================
-  
-  Read the QUICK-START document in the Docs/ directory for instructions.
-
-
-  Creating a new port
-=====================
-
-  Look at the existing front ends for example implementations.  The framebuffer
-  front end is simplest and most self-contained.  Also, you can contact the
-  developers for help:
-
-      http://www.netsurf-browser.org/contact/
-
-  Check out the developer documentation sources listed below too.
-
-
-  Further documentation
-=======================
-
-  The Developer section of the web site has loads of info to get you started:
-
-      http://www.netsurf-browser.org/developers/
-
-  General documentation on how NetSurf's code works can be found on the
-  development wiki:
-
-      http://wiki.netsurf-browser.org/Documentation/
-
-  The code style guide is here:
-
-      http://www.netsurf-browser.org/developers/StyleGuide.pdf
+----------------------------------------------------------------------------------
