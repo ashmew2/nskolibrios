@@ -32,14 +32,17 @@
 #include "kolibrios/gui_search_web_table.h"
 #include "kolibrios/gui_utf8_table.h"
 
+#include "kolibrios/kolibri_http.h"
+
 /**
  * Main entry point from Kolibri OS.
  */
+extern struct http_msg;
 
 int main(int argc, char** argv)
     {
-      nserror ret;
-      /*Also makes sense to have a kolibri_init_libraries(); here which inits all the libraries we'll need */
+    nserror ret;
+    /*Also makes sense to have a kolibri_init_libraries(); here which inits all the libraries we'll need */
 
     /* Need to handle the cookie jar somehow */
     /* First off, get the frontend connected with render engine of NS */
@@ -61,15 +64,47 @@ int main(int argc, char** argv)
 	.llcache = &kolibri_gui_llcache_table,
 	};
 
+    debug_board_write_str("Netsurf: Trying to register nskolibri_table.\n");
+
+    /* Initialize KolibriOS related libraries which Netsurf will use */
+
+    /* Initialize HTTP Library */
+    ret = kolibri_http_init();
+    if (ret == 0)
+      debug_board_write_str("Netsurf: KolibriOS HTTP Library Initialized.\n");
+    else {
+      debug_board_write_str("Netsurf: HTTP Library initialization failed..\n");
+      return ret;
+    }      
+
+  /* Initialize BoxLib Library for GUI textboxes, etc */
+    ret = kolibri_boxlib_init();
+    if (ret == 0)
+      debug_board_write_str("Netsurf: KolibriOS BOXLIB Library Initialized.\n");
+    else {
+      debug_board_write_str("Netsurf: BOXLIB Library initialization failed..\n");
+      return ret;
+    }      
+
+    /* End of KolibriOS specific libraries initialization phase */
+
     ret = netsurf_register(&nskolibri_table);
-    
-    if(ret != NSERROR_OK)
-      debug_board_write_str("NSERROR IS OK!\n\n\n");
-    else
-      debug_board_write_str("NSERROR -> FAILED TO INIT\n\n");
+    if(ret == NSERROR_OK)
+      debug_board_write_str("Netsurf for KolibriOS: Core Table Initialization Successful.\n");
+    else {
+      debug_board_write_str("Netsurf: Fatal ERROR -> Core Table Initialization Failed.\n");
+      return ret;
+    }
 
-    debug_board_write_str("Good Bye. See you Soon!.\n");
-
+    debug_board_write_str("Initializing Netsurf Core.");
+    ret = netsurf_init("/rd/0/1/");
+    if(ret == NSERROR_OK)
+      debug_board_write_str("Successful!.\n");
+    else {
+      debug_board_write_str("Failed. Aborting.\n");
+      return ret;
+    }
+      
     return 0;
     }
 
