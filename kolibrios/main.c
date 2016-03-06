@@ -6,6 +6,10 @@
 
 #include "utils/errors.h"
 
+#include "utils/messages.h"
+#include "utils/filepath.h"
+#include "utils/nsoption.h"
+
 #include "desktop/gui_table.h" /* netsurf_table struct */
 #include "desktop/gui_misc.h" /* gui_browser_table struct */
 #include "desktop/gui_window.h" /* gui_window_table struct */
@@ -34,6 +38,34 @@
 
 #include "kolibrios/kolibri_http.h"
 
+char **respaths; /** resource search path vector */
+
+/* Inspired from monkey, but without the GTK bloat */
+static char **
+nskolibri_init_resource(const char *resource_path)
+{
+  char **langv = {"de", "en_US", "en", "C"};
+  char **pathv; /* resource path string vector */
+  char **respath; /* resource paths vector */
+
+  pathv = filepath_path_to_strvec(resource_path);
+  respath = filepath_generate(pathv, langv);
+  filepath_free_strvec(pathv);
+
+  return respath;
+}
+
+static nserror set_defaults(struct nsoption_s *defaults)
+{
+  /* Set defaults for absent option strings */
+  nsoption_setnull_charp(cookie_file, strdup("/usbhd0/1/Cookies"));
+  nsoption_setnull_charp(cookie_jar, strdup("/usbhd0/1/Cookies"));
+  //TODO: This creates an nsoptions error in macro expansion...
+  //  nsoption_setnull_charp(url_file, strdup("/usbhd0/1/URLs"));
+
+  return NSERROR_OK;
+}
+
 /**
  * Main entry point from Kolibri OS.
  */
@@ -50,21 +82,22 @@ int main(int argc, char** argv)
       
     struct netsurf_table nskolibri_table = {
 	/* Tables in Use */
+        /* Mandatory tables (From Monkey frontend) */
 	.browser = &kolibri_browser_table,
 	.window = &kolibri_window_table,
 	.download = &kolibri_download_table,
-	.clipboard = &kolibri_clipboard_table,
 	.fetch = &kolibri_fetch_table,
 	.bitmap = &kolibri_bitmap_table,
 
-	.file = &kolibri_gui_file_table,
-	.utf8 = &kolibri_gui_utf8_table,
-	.search = &kolibri_gui_search_table,
-	.search_web = &kolibri_search_web_table,
-	.llcache = &kolibri_gui_llcache_table,
+        /* Optional tables (Not in Monkey, so I assumed optional) */
+	/* TODO: Use them in the future, comment out for now for easy debug */
+	/* .clipboard = &kolibri_clipboard_table, */
+	/* .file = &kolibri_gui_file_table, */
+	/* .utf8 = &kolibri_gui_utf8_table, */
+	/* .search = &kolibri_gui_search_table, */
+	/* .search_web = &kolibri_search_web_table, */
+	/* .llcache = &kolibri_gui_llcache_table, */
 	};
-
-    debug_board_write_str("Netsurf: Trying to register nskolibri_table.\n");
 
     /* Initialize KolibriOS related libraries which Netsurf will use */
 
@@ -87,8 +120,9 @@ int main(int argc, char** argv)
     }      
 
     /* End of KolibriOS specific libraries initialization phase */
-
+    debug_board_write_str("Netsurf: Trying to register nskolibri_table.\n");
     ret = netsurf_register(&nskolibri_table);
+
     if(ret == NSERROR_OK)
       debug_board_write_str("Netsurf for KolibriOS: Core Table Initialization Successful.\n");
     else {
@@ -96,8 +130,17 @@ int main(int argc, char** argv)
       return ret;
     }
 
+    respaths = nskolibri_init_resource("/usbhd0/1/gtk/res");
     debug_board_write_str("Initializing Netsurf Core.");
-    ret = netsurf_init("/rd/0/1/");
+
+    ret = nsoption_init(set_defaults, &nsoptions, &nsoptions_default);
+
+    if (ret != NSERROR_OK) {
+      debug_board_write_str("Options failed to initialise\n");
+      return -2;
+    }
+
+    ret = netsurf_init(NULL);
     if(ret == NSERROR_OK)
       debug_board_write_str("Successful!.\n");
     else {
