@@ -31,9 +31,9 @@ Running the binary on KolibriOS
 
 Copy the executable nsbin into a directory.
 
-Set up the kolibrios/ directory as this is required for running libc 
-applications like Netsurf.
+Set up the kolibrios/ directory as this is required for running libc applications like Netsurf.
 
+You also need boxlib and http obj libraries at least (These are part of standard installation, so I don't think it needs any setup).
 
 CleverMouse said "You have probably not configured the folder /kolibrios. In order to do 
 this, copy the folder /kolibrios and the file kolibri.lbl from the 
