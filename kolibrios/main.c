@@ -9,6 +9,7 @@
 #include "utils/messages.h"
 #include "utils/filepath.h"
 #include "utils/nsoption.h"
+#include "utils/nsurl.h"
 
 #include "desktop/gui_table.h" /* netsurf_table struct */
 #include "desktop/gui_misc.h" /* gui_browser_table struct */
@@ -18,6 +19,8 @@
 #include "desktop/gui_clipboard.h" /* gui_clipboard_table struct */
 #include "desktop/gui_download.h" /* gui_download_table struct */
 #include "desktop/gui_fetch.h" /* gui_fetch_table struct */
+#include "desktop/browser.h"
+
 #include "utils/file.h" /* gui_file_table struct */
 #include "desktop/gui_utf8.h" /* gui_utf8_table struct */
 #include "desktop/gui_search.h" /* gui_search_table struct */
@@ -73,7 +76,10 @@ extern struct http_msg;
 
 int main(int argc, char** argv)
     {
+    nsurl *initial_url;  
     nserror ret;
+    unsigned int os_event = KOLIBRI_EVENT_REDRAW;
+
     /*Also makes sense to have a kolibri_init_libraries(); here which inits all the libraries we'll need */
 
     /* Need to handle the cookie jar somehow */
@@ -111,7 +117,7 @@ int main(int argc, char** argv)
     }      
 
   /* Initialize BoxLib Library for GUI textboxes, etc */
-    ret = kolibri_boxlib_init();
+    ret = kolibri_gui_init();
     if (ret == 0)
       debug_board_write_str("Netsurf: KolibriOS BOXLIB Library Initialized.\n");
     else {
@@ -142,12 +148,34 @@ int main(int argc, char** argv)
 
     ret = netsurf_init(NULL);
     if(ret == NSERROR_OK)
-      debug_board_write_str("Successful!.\n");
+      debug_board_write_str("Successful!. Exiting Netsurf Gracefully.\n");
     else {
-      debug_board_write_str("Failed. Aborting.\n");
+      debug_board_write_str("Failed. Netsurf Abnormal Termination.\n");
       return ret;
     }
-      
+
+    if (nsurl_create("http://www.kolibrios.org", &initial_url) == NSERROR_OK)
+      {
+	nserror error = browser_window_create(BW_CREATE_HISTORY,
+				      initial_url,
+				      NULL,
+				      NULL,
+				      NULL);
+	nsurl_unref(initial_url);
+      }
+    else
+      {
+	debug_board_write_str("Failed to create initial URL for Netsurf. Exiting.\n");
+	return 2;
+      }
+
+  do  /* Start of main activity loop */
+    {
+      char event[20];
+      sprintf(event, "ev: %u", os_event);
+      debug_board_write_str(event);
+    } while(os_event = get_os_event()); /* End of main activity loop */
+
     return 0;
     }
 
