@@ -1,5 +1,11 @@
 rm -rf build-Linux-kolibrios/
-make TARGET=kolibrios
+PKG_CONFIG_PATH=/usr/local/lib/pkgconfig make TARGET=kolibrios
+
+if [ "$?" -ne "0" ]; then
+    echo "The make step failed. Aborting."
+    exit 2
+fi
+
 cd build-Linux-kolibrios
 
 cp ../kolibrios/*obj .
