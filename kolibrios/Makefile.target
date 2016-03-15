@@ -8,8 +8,7 @@ NETSURF_FEATURE_MOZJS_CFLAGS := -DWITH_MOZJS -DJS_HAS_FILE_OBJECT=0
 
 CWARNFLAGS += -Wno-error
 
-CFLAGS += -I/home/bob/kolibrios/contrib/sdk/sources/newlib/libc/include -I/home/bob/dev-netsurf/workspace/inst-i686-linux-gnu/include \
-          -I/home/bob/kolibrios/contrib/sdk/sources/zlib \
+CFLAGS += -I/home/bob/kolibrios/contrib/sdk/sources/newlib/libc/include -I/home/bob/dev-netsurf/workspace/inst-i686-linux-gnu/include -I/home/bob/kolibrios/contrib/sdk/sources/libpng/ -I/home/bob/kolibrios/contrib/sdk/sources/zlib -I/home/bob/kolibrios/contrib/sdk/sources/freetype/include \
        	  -std=c99 -D_KOLIBRIOS -Dnskolibrios -g \
 	  -Wundef \
 	  -U_Win32 -U_WIN32 -U__MINGW32__ \
@@ -43,10 +42,13 @@ $(eval $(call pkg_config_find_and_add_enabled,MOZJS,mozjs185,JavaScript))
 $(eval $(call pkg_config_find_and_add_enabled,JS,mozilla-js,JavaScript))
 
 S_KOLIBRIOS := main.c kolibri_misc.c kolibri_debug.c kolibri_filesystem.c kolibri_iconv.c kolibri_regex.c kolibri_http.c 
-
 S_KOLIBRIOS := $(addprefix kolibrios/,$(S_KOLIBRIOS))
 
-SOURCES = $(S_COMMON) $(S_IMAGE) $(S_BROWSER) $(S_KOLIBRIOS)
+S_FRAMEBUFFER := convert_image.c fb_search.c gui.c schedule.c bitmap.c font_freetype.c clipboard.c fetch.c font_internal.c localhistory.c misc.c convert_font.c findfile.c framebuffer.c
+
+S_FRAMEBUFFER := $(addprefix framebuffer/,$(S_FRAMEBUFFER))
+
+SOURCES = $(S_COMMON) $(S_IMAGE) $(S_BROWSER) $(S_FRAMEBUFFER) $(S_KOLIBRIOS)
 
 EXETARGET := nskolibrios
 
