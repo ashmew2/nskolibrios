@@ -115,7 +115,12 @@ int main(int argc, char** argv)
       debug_board_write_str("Netsurf: HTTP Library initialization failed..\n");
       return ret;
     }      
-
+    //      __asm__ __volatile__("int3");
+      {
+	debug_board_write_str("Test get http\n");
+	http_get_asm("www.kolibrios.org", 0, 0, 0);
+	debug_board_write_str("Tested get http\n");
+      }
   /* Initialize BoxLib Library for GUI textboxes, etc */
     ret = kolibri_gui_init();
     if (ret == 0)
@@ -123,7 +128,7 @@ int main(int argc, char** argv)
     else {
       debug_board_write_str("Netsurf: BOXLIB Library initialization failed..\n");
       return ret;
-    }      
+    }
 
     /* End of KolibriOS specific libraries initialization phase */
     debug_board_write_str("Netsurf: Trying to register nskolibri_table.\n");
@@ -148,9 +153,9 @@ int main(int argc, char** argv)
 
     ret = netsurf_init(NULL);
     if(ret == NSERROR_OK)
-      debug_board_write_str("Successful!. Exiting Netsurf Gracefully.\n");
+      debug_board_write_str("netsurf_init Successful!. \n");
     else {
-      debug_board_write_str("Failed. Netsurf Abnormal Termination.\n");
+      debug_board_write_str("netsurf_init Failed. Aborting Netsurf execution.\n");
       return ret;
     }
 
@@ -168,15 +173,40 @@ int main(int argc, char** argv)
 	debug_board_write_str("Failed to create initial URL for Netsurf. Exiting.\n");
 	return 2;
       }
+    
+      do  /* Start of main activity loop */
+	{
+	  char event[20];
+	  sprintf(event, "ev: %u\n", os_event);
+	  debug_board_write_str(event);
 
-  do  /* Start of main activity loop */
-    {
-      char event[20];
-      sprintf(event, "ev: %u", os_event);
-      debug_board_write_str(event);
-    } while(os_event = get_os_event()); /* End of main activity loop */
+	  if(os_event == KOLIBRI_EVENT_REDRAW)
+	    {
+	      kolibri_handle_event_redraw(master_window);
+	    }
+	  else if(os_event == KOLIBRI_EVENT_KEY)
+	    {
+	      kolibri_handle_event_key(master_window);
+	    }
+	  else if(os_event == KOLIBRI_EVENT_BUTTON)
+	    {
+	      unsigned int pressed_button = kolibri_button_get_identifier();
 
+	      /* if(pressed_button = 0x00123456) /\* Our button was pressed *\/ */
+	      /* 	{ */
+	      /* 	  if(checkbox -> flags & CHECKBOX_IS_SET) /\* Append BoardMsg checkbox is set *\/ */
+	      /* 	    debug_board_write_str("BOARDMSG: "); */
+
+	      /* 	  debug_board_write_str(textbox->text); */
+	      /* 	  debug_board_write_str("\n"); */
+	      /* 	} */
+	    }
+	  else if(os_event == KOLIBRI_EVENT_MOUSE)
+	    {
+	      kolibri_handle_event_mouse(master_window);
+	    }
+	} while(os_event = get_os_event()); /* End of main activity loop */
+      
     return 0;
-    }
 
-/* End of main() */
+    } /* End of main() */

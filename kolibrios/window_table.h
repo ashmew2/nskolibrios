@@ -5,31 +5,66 @@
 /* Only implement required functions right now. Optional later. */
 /* ------------------------------ */
 
-/* Represents a tab */
 struct gui_window {
   struct browser_window *root;
 
   char *title;
   char *url;
-
+  void *kobject; /* Kolibri GUI Window for now */
+  
   struct gui_window *next, *prev;
 };
 
+struct gui_window *master_window;
+
 struct gui_window* kolibri_create_window(struct browser_window *bw, struct gui_window *existing, gui_window_create_flags flags)
 {
-  struct gui_window *new_tab_window = (struct gui_window *)malloc(sizeof(struct gui_window));
-  new_tab_window->root = bw;
-  new_tab_window->url = NULL;
-  new_tab_window->title = NULL;
+  struct gui_window *new_window = (struct gui_window *)malloc(sizeof(struct gui_window));
   
+  unsigned int gui_event = KOLIBRI_EVENT_REDRAW;
+  struct kolibri_window *main_window = kolibri_new_window(20, 20, 400, 400, "Netsurf: Official Port for KolibriOS.");
+  struct edit_box *textbox = kolibri_new_edit_box(30, 30, 40);
+  kolibri_window_add_element(main_window, KOLIBRI_EDIT_BOX, textbox);
+
+  debug_board_write_str("Creating New GUI window for Netsurf \n");
+
+  new_window->root = bw;
+  new_window->url = NULL;
+  new_window->title = NULL;
+  new_window->kobject = main_window;
+
+  /* do  /\* Start of main activity loop *\/ */
+  /*   { */
+  /*     if(gui_event == KOLIBRI_EVENT_REDRAW) */
+  /* 	{ */
+  /* 	  kolibri_handle_event_redraw(main_window); */
+  /* 	} */
+  /*     else if(gui_event == KOLIBRI_EVENT_KEY) */
+  /* 	{ */
+  /* 	  kolibri_handle_event_key(main_window); */
+  /* 	} */
+  /*     else if(gui_event == KOLIBRI_EVENT_BUTTON) */
+  /* 	{ */
+
+  /* 	} */
+  /*     else if(gui_event == KOLIBRI_EVENT_MOUSE) */
+  /* 	{ */
+  /* 	  kolibri_handle_event_mouse(main_window); */
+  /* 	} */
+  /*   } while(gui_event = get_os_event()); /\* End of main activity loop *\/ */
+
+  /* TODO:Fix this according to flags maybe> */
+
   if(existing)
-    new_tab_window->prev = existing;
+    new_window->prev = existing;
   else
-    new_tab_window->prev = NULL;
+    new_window->prev = NULL;
   
-  new_tab_window->next = NULL;
-  
-  return new_tab_window;
+  new_window->next = NULL;
+  debug_board_write_str("Returning new GUI window to NS\n");
+
+  master_window = new_window;
+  return new_window;
 }
 
 void kolibri_destroy_window(struct gui_window *gw)
