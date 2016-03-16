@@ -74,6 +74,8 @@ static struct nsoption_s defaults[] = {
 #include "atari/options.h"
 #elif defined(nsmonkey)
 #include "monkey/options.h"
+#elif defined(nskolibrios)
+#include "kolibrios/options.h"
 #endif
 	{ NULL, 0, OPTION_INTEGER, { 0 } }
 };
