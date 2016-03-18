@@ -210,6 +210,7 @@ ifeq ($(TARGET),riscos)
 else
   ifeq ($(TARGET),kolibrios)
       CC := /home/autobuild/tools/win32/bin/kos32-gcc
+      LD := /home/autobuild/tools/win32/bin/kos32-ld
       FASM := fasm
   endif
 
@@ -369,7 +370,6 @@ endef
 # 6: Parameters to add to LDFLAGS when disabled
 define feature_switch
   ifeq ($$(NETSURF_USE_$(1)),YES)
-$(warning BUILDING FEATURE $(1))
     CFLAGS += $(3)
     CXXFLAGS += $(3)
     LDFLAGS += $(4)
@@ -377,7 +377,6 @@ $(warning BUILDING FEATURE $(1))
       $$(info M.CONFIG: $(2)	enabled       (NETSURF_USE_$(1) := YES))
     endif
   else ifeq ($$(NETSURF_USE_$(1)),NO)
-$(warning NOT BUILDING FEATURE $(1))
     CFLAGS += $(5)
     CXXFLAGS += $(5)
     LDFLAGS += $(6)
@@ -640,15 +639,17 @@ OBJECTS := $(sort $(addprefix $(OBJROOT)/,$(subst /,_,$(patsubst %.c,%.o,$(patsu
 
 $(EXETARGET): $(OBJECTS) $(RESOURCES) $(MESSAGES)
 	$(VQ)echo "    LINK: $(EXETARGET)"
-
-ifneq ($(TARGET)$(SUBTARGET),riscos-elf)
-	$(VQ)echo "    FUCK THIS SHIT: $(LDFLAGS)"
-	$(Q)$(CC) -o $(EXETARGET) $(LDFLAGS) $(OBJECTS) kolibrios/loadboxlib.obj
+ifeq ($(TARGET),kolibrios)
+	$(VQ)echo "    LDFLAGS: $(LDFLAGS)"
+	$(Q)$(LD) $(OBJECTS) loadboxlib.obj loadhttp.obj $(LDFLAGS) -o $(EXETARGET)
+else ifneq ($(TARGET)$(SUBTARGET),riscos-elf)
+	$(Q)$(CC) -o $(EXETARGET) $(OBJECTS) $(LDFLAGS)
 else
 	$(Q)$(CXX) -o $(EXETARGET:,ff8=,e1f) $(OBJECTS) $(LDFLAGS)
 	$(Q)$(ELF2AIF) $(EXETARGET:,ff8=,e1f) $(EXETARGET)
 	$(Q)$(RM) $(EXETARGET:,ff8=,e1f)
 endif
+
 ifeq ($(TARGET),windows)
 	$(Q)$(TOUCH) windows/res/preferences
 endif
@@ -670,7 +671,6 @@ ifeq ($(TARGET),beos)
 	$(VQ)echo " MIMESET: $(EXETARGET)"
 	$(Q)$(BEOS_MIMESET) $(EXETARGET)
 endif
-
 
 clean-target:
 	$(VQ)echo "   CLEAN: $(EXETARGET)"
@@ -738,7 +738,6 @@ endef
 else
 define compile_target_c
 $$(DEPROOT)/$(3) $$(OBJROOT)/$(2): $$(OBJROOT)/created
-	$$(VQ)echo " FUCK: $(1)"
 	$$(VQ)echo " COMPILE: $(1)"
 	$$(Q)$$(RM) $$(DEPROOT)/$(3)
 	$$(Q)$$(RM) $$(OBJROOT)/$(2)
