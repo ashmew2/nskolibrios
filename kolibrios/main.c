@@ -86,6 +86,13 @@ extern bool nslog_stream_configure(FILE *fptr);
 extern struct fbtk_bitmap pointer_image;
 extern fbtk_widget_t *fbtk;
 
+static void die(const char *error)
+{
+	debug_board_write_str(error);
+	debug_board_write_str('\n');
+	exit(1);
+}
+
 /* Inspired from monkey, but without the GTK bloat */
 static char **
 nskolibri_init_resource(const char *resource_path)
@@ -299,7 +306,7 @@ main(int argc, char** argv)
       die("NetSurf operation table failed registration");
     }
 
-    respaths = fb_init_resource("/usbhd0/1/framebuffer/res");
+    respaths = fb_init_resource("/usbhd0/1/kolibrios/fb/res/");
 
     /* initialise logging. Not fatal if it fails but not much we
      * can do about it either.
@@ -332,9 +339,32 @@ main(int argc, char** argv)
 
     /* Override, since we have no support for non-core SELECT menu */
     nsoption_set_bool(core_select_menu, true);
+    /* Do we really need to parse command line in KolibriOS?
+       Most users will use the GUI to trigger NS .
+       TODO: Look at this later.
+    */
 
-    if (process_cmdline(argc,argv) != true)
-      die("unable to process command line.\n");
+    /* if (process_cmdline(argc,argv) != true) */
+    /*   die("unable to process command line.\n"); */
+
+    /* Move the initialization stuff from process_cmdline() to here */
+    fename = "sdl";
+    febpp = 24;
+
+    /* fewidth = nsoption_int(window_width); */
+    /* if (fewidth <= 0) { */
+    /*   fewidth = 800; */
+    /* } */
+
+    /* feheight = nsoption_int(window_height); */
+    /* if (feheight <= 0) { */
+    /*   feheight = 600; */
+    /* } */
+    
+    fewidth = 800;
+    feheight = 600;
+
+    feurl = "http://www.kolibrios.org";
 
     nsfb = framebuffer_initialise(fename, fewidth, feheight, febpp);
     if (nsfb == NULL)
@@ -353,7 +383,7 @@ main(int argc, char** argv)
 
     /* create an initial browser window */
 
-    LOG("calling browser_window_create");
+    debug_board_write_str("calling browser_window_create\n");
 
     ret = nsurl_create(feurl, &url);
     if (ret == NSERROR_OK) {
@@ -367,11 +397,15 @@ main(int argc, char** argv)
     if (ret != NSERROR_OK) {
       warn_user(messages_get_errorcode(ret), 0);
     } else {
+      debug_board_write_str("calling framebuffer run\n");
+      __asm__ __volatile__("int3");
       framebuffer_run();
+      debug_board_write_str("framebuffer run returned. \n");
 
       browser_window_destroy(bw);
     }
 
+    debug_board_write_str("Calling netsurf_exit()\n");
     netsurf_exit();
 
     if (fb_font_finalise() == false)
