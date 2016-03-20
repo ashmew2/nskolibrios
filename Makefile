@@ -641,7 +641,8 @@ $(EXETARGET): $(OBJECTS) $(RESOURCES) $(MESSAGES)
 	$(VQ)echo "    LINK: $(EXETARGET)"
 ifeq ($(TARGET),kolibrios)
 	$(VQ)echo "    LDFLAGS: $(LDFLAGS)"
-	$(Q)$(LD) $(OBJECTS) loadboxlib.obj loadhttp.obj $(LDFLAGS) -o $(EXETARGET)
+	$(Q)$(LD) $(OBJECTS) loadboxlib.obj loadhttp.obj $(LDFLAGS) -o $(EXETARGET) -Map $(EXETARGET).map
+	objcopy -O binary nskolibrios 
 else ifneq ($(TARGET)$(SUBTARGET),riscos-elf)
 	$(Q)$(CC) -o $(EXETARGET) $(OBJECTS) $(LDFLAGS)
 else
