@@ -12,7 +12,7 @@
 /* http_msg defined in kolibrios/kolibri_http.h */
 extern struct http_msg;
 
-struct http_msg* http_kolibri_handle_init(void);
+bool http_kolibri_handle_init(void);
 
 /* TODO: multi handle should be a linked list of http_msg just like we implemented in Sourcerer's port */
 struct http_kolibri_multi_handle {
