@@ -864,6 +864,7 @@ nserror browser_window_create(enum browser_window_create_flags flags,
 	}
 
 	if (url != NULL) {
+	  debug_board_write_str("Got GUI window. Will Navigate now\n");
 		enum browser_window_nav_flags nav_flags = BW_NAVIGATE_NONE;
 		if (flags & BW_CREATE_UNVERIFIABLE)
 			nav_flags |= BW_NAVIGATE_UNVERIFIABLE;
@@ -1933,6 +1934,8 @@ nserror browser_window_navigate(struct browser_window *bw,
 	assert(bw);
 	assert(url);
 
+	debug_board_write_str("Asserted bw and URL fine in navigate()\n");
+	
 	LOG("bw %p, url %s", bw, nsurl_access(url));
 
 	/* don't allow massively nested framesets */
@@ -2042,6 +2045,8 @@ nserror browser_window_navigate(struct browser_window *bw,
 		fetch_flags |= HLCACHE_RETRIEVE_MAY_DOWNLOAD;
 	}
 
+	debug_board_write_str("Calling hlcache_handle_retrieve()\n");
+
 	error = hlcache_handle_retrieve(url,
 			fetch_flags | HLCACHE_RETRIEVE_SNIFF_TYPE,
 			referrer,
@@ -2050,6 +2055,8 @@ nserror browser_window_navigate(struct browser_window *bw,
 			parent != NULL ? &child : NULL,
 			CONTENT_ANY, &c);
 
+	debug_board_write_str(" hlcache_handle_retrieve() returned. Back in browser.c\n");
+	
 	switch (error) {
 	case NSERROR_OK:
 		bw->loading_content = c;
@@ -2080,6 +2087,7 @@ nserror browser_window_navigate(struct browser_window *bw,
 	/* Record time */
 	bw->last_action = wallclock();
 
+	debug_board_write_str("Returning after navigate\n");
 	return error;
 }
 

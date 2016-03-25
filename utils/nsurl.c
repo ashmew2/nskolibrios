@@ -42,7 +42,7 @@
 
 
 /* Define to enable NSURL debugging */
-#undef NSURL_DEBUG
+#define NSURL_DEBUG
 
 /**
  * Return a hex digit for the given numerical value.
@@ -286,7 +286,7 @@ static void nsurl__get_string_markers(const char * const url_s,
 
 	/* Skip any leading whitespace in url_s */
 	while (isspace(*pos))
-		pos++;
+	    pos++;
 
 	/* Record start point */
 	marker.start = pos - url_s;
@@ -1366,6 +1366,8 @@ nserror nsurl_create(const char * const url_s, nsurl **url)
 
 	assert(url_s != NULL);
 
+	printf("%s\n", url_s);
+
 	/* Peg out the URL sections */
 	nsurl__get_string_markers(url_s, &m, false);
 
@@ -1374,7 +1376,7 @@ nserror nsurl_create(const char * const url_s, nsurl **url)
 
 	/* Allocate enough memory to url escape the longest section */
 	buff = malloc(length * 3 + 1);
-	if (buff == NULL)
+	if (buff == NULL) 
 		return NSERROR_NOMEM;
 
 	/* Set scheme type */
