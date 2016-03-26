@@ -659,9 +659,14 @@ nserror hlcache_handle_retrieve(nsurl *url, uint32_t flags,
 	ctx->handle->cb = cb;
 	ctx->handle->pw = pw;
 
+	debug_board_write_str("Calling llcache_handle_retrieve()\n");
+
 	error = llcache_handle_retrieve(url, flags, referer, post,
 			hlcache_llcache_callback, ctx,
 			&ctx->llcache);
+
+	debug_board_write_str("llcache_handle_retrieve() returned\n");
+
 	if (error != NSERROR_OK) {
 		/* error retriving handle so free context and return error */
 		free((char *) ctx->child.charset);

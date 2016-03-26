@@ -856,6 +856,8 @@ static nserror llcache_object_refetch(llcache_object *object)
 	LLCACHE_LOG("Refetching %p", object);
 
 	/* Kick off fetch */
+	debug_board_write_str("Calling fetch_start\n");
+
 	res = fetch_start(object->url,
 			  object->fetch.referer,
 			  llcache_fetch_callback,
@@ -917,6 +919,7 @@ static nserror llcache_object_fetch(llcache_object *object, uint32_t flags,
 	object->fetch.redirect_count = redirect_count;
 	object->fetch.retries_remaining = llcache->fetch_attempts;
 
+	debug_board_write_str("Calling llcache_object_refetch\n");
 	return llcache_object_refetch(object);
 }
 
@@ -1354,12 +1357,16 @@ llcache_process_metadata(llcache_object *object)
 	size_t hloop;
 
 	LOG("Retriving metadata");
+	debug_board_write_str("Inside process metadata. Calling guit->llcache->fetch \n");
 
 	/* attempt to retrieve object metadata from the backing store */
 	res = guit->llcache->fetch(object->url,
 				   BACKING_STORE_META,
 				   &metadata,
 				   &metadatalen);
+
+	debug_board_write_str("Returned from llcache fetcch \n");
+
 	if (res != NSERROR_OK) {
 		return res;
 	}
@@ -1538,7 +1545,7 @@ llcache_object_fetch_persistant(llcache_object *object,
 	/* fetch is "finished" */
 	object->fetch.state = LLCACHE_FETCH_COMPLETE;
 	object->fetch.fetch = NULL;
-
+	debug_board_write_str("Returning from persistant\n");
 	return NSERROR_OK;
 }
 
@@ -1578,19 +1585,32 @@ llcache_object_retrieve_from_cache(nsurl *url,
 		}
 	}
 
+	debug_board_write_str("Inside llcache_object_retrieve_from_cache()\n");
+
 	/* No viable object found in cache create one and attempt to
 	 * pull from persistant store.
 	 */
 	if (newest == NULL) {
 		LLCACHE_LOG("No viable object found in llcache");
 
+		debug_board_write_str("newest is NULL. Calling llcache object.\n");
+
 		error = llcache_object_new(url, &obj);
 		if (error != NSERROR_OK)
 			return error;
 
+		debug_board_write_str("newest is NULL. llcache object new returned.\n");
+
 		/* attempt to retrieve object from persistant store */
+
+		debug_board_write_str("llcache_object_fetch_persistant.\n");
+
 		error = llcache_object_fetch_persistant(obj, flags, referer, post, redirect_count);
+
+		debug_board_write_str("Returned from persistant\n");
+
 		if (error == NSERROR_OK) {
+		  debug_board_write_str("NSERROR OK for persistant store\n");
 			LLCACHE_LOG("retrived object from persistant store");
 
 			/* set newest object from persistant store which
@@ -1608,6 +1628,8 @@ llcache_object_retrieve_from_cache(nsurl *url,
 	}
 
 	if ((newest != NULL) && (llcache_object_is_fresh(newest))) {
+		debug_board_write_str("newest is NOT NULL. llcache object new returned.\n");
+
 		/* Found a suitable object, and it's still fresh */
 		LLCACHE_LOG("Found fresh %p", newest);
 
@@ -1641,6 +1663,7 @@ llcache_object_retrieve_from_cache(nsurl *url,
 		}
 	} else if (newest != NULL) {
 		/* Found a candidate object but it needs freshness validation */
+		  debug_board_write_str("newest is not NULL. Second branch.\n");
 
 		/* ensure the source data is present */
 		error = llcache_persist_retrieve(newest);
@@ -1698,17 +1721,23 @@ llcache_object_retrieve_from_cache(nsurl *url,
 	}
 
 	/* Attempt to kick-off fetch */
+	debug_board_write_str("Calling llcache_object_fetch\n");
+
 	error = llcache_object_fetch(obj, flags, referer, post, redirect_count);
+
+	debug_board_write_str("After Calling llcache_object_fetch\n");
+
 	if (error != NSERROR_OK) {
 		llcache_object_destroy(obj);
 		return error;
 	}
-
+	debug_board_write_str("Add new llcache object to list\n");
 	/* Add new object to cache */
 	llcache_object_add_to_list(obj, &llcache->cached_objects);
 
 	*result = obj;
 
+	debug_board_write_str("Returning from llcache_object_retrieve_from_cache\n");
 	return NSERROR_OK;
 }
 
@@ -1808,6 +1837,7 @@ llcache_object_retrieve(nsurl *url,
 
 	nsurl_unref(defragmented_url);
 
+	debug_board_write_str("Returning from llcache_object_retrieve\n");
 	return NSERROR_OK;
 }
 
@@ -3457,7 +3487,12 @@ nserror llcache_handle_retrieve(nsurl *url, uint32_t flags,
 
 	/* Retrieve a suitable object from the cache,
 	 * creating a new one if needed. */
+	debug_board_write_str("Calling llcache_object_retrieve()\n");
+
 	error = llcache_object_retrieve(url, flags, referer, post, 0, &object);
+
+	debug_board_write_str("llcache_object_retrieve() did not crash.\n");
+
 	if (error != NSERROR_OK) {
 		llcache_object_user_destroy(user);
 		return error;
