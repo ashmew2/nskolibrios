@@ -38,6 +38,7 @@ static FILE *logfile;
 
 nserror nslog_init(nslog_ensure_t *ensure, int *pargc, char **argv)
 {
+  return NSERROR_OK;
 	struct utsname utsname;
 	nserror ret = NSERROR_OK;
 
@@ -173,17 +174,24 @@ static const char *nslog_gettime(void)
 
 void nslog_log(const char *file, const char *func, int ln, const char *format, ...)
 {
+  /* debug_board_write_str("Inside nslog_log\n\n"); */
+  /* __asm__ __volatile__("int3"); */
+  
 	va_list ap;
-
-	fprintf(logfile, "%s %s:%i %s: ", nslog_gettime(), file, ln, func);
+	char log_board[300];
 
 	va_start(ap, format);
-
-	vfprintf(logfile, format, ap);
-
+	vsprintf(log_board, format, ap);
 	va_end(ap);
 
-	fputc('\n', logfile);
+	debug_board_write_str(log_board);
+	debug_board_write_str("\n");
+
+	/* fprintf(logfile, "%s %s:%i %s: ", nslog_gettime(), file, ln, func); */
+	/* va_start(ap, format); */
+	/* vfprintf(logfile, format, ap); */
+	/* va_end(ap); */
+	/* fputc('\n', logfile); */
 }
 
 #endif

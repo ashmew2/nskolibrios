@@ -43,9 +43,9 @@ typedef bool(nslog_ensure_t)(FILE *fptr);
  */
 extern nserror nslog_init(nslog_ensure_t *ensure, int *pargc, char **argv);
 
-#ifdef NDEBUG
-#  define LOG(format, ...) ((void) 0)
-#else
+/* #ifdef NDEBUG */
+/* #  define LOG(format, ...) ((void) 0) */
+/* #else */
 
 extern void nslog_log(const char *file, const char *func, int ln, const char *format, ...) __attribute__ ((format (printf, 4, 5)));
 
@@ -60,13 +60,8 @@ extern void nslog_log(const char *file, const char *func, int ln, const char *fo
 #    define LOG_LN __LINE__
 #  endif
 
-#define LOG(format, args...)						\
-	do {								\
-		if (verbose_log) {					\
-			nslog_log(__FILE__, LOG_FN, LOG_LN, format , ##args); \
-		}							\
-	} while(0)
+#define LOG(format, args...) do { nslog_log(__FILE__, LOG_FN, LOG_LN, format , ##args);	} while(0)
 
-#endif
+/* #endif */
 
 #endif
