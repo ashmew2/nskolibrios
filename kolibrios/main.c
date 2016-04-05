@@ -43,6 +43,7 @@
 #include <libnsfb.h>
 #include <libnsfb_plot.h>
 #include <libnsfb_event.h>
+#include <libnsfb_surface.h>
 
 #include "utils/utils.h"
 #include "utils/nsoption.h"
@@ -67,6 +68,13 @@
 #include "framebuffer/clipboard.h"
 #include "framebuffer/fetch.h"
 #include "framebuffer/bitmap.h"
+
+/**************************************************
+Make life easier with these path specifiers here.
+***************************************************/
+#define KOLIBRI_FONTFILE "/usbhd0/1/kolibrios/res/sans.ttf"
+#define KOLIBRI_RESPATH "/usbhd0/1/kolibrios/res/"
+/************************************************/
 
 char **respaths; /** resource search path vector */
 
@@ -94,8 +102,7 @@ static void die(const char *error)
 }
 
 /* Inspired from monkey, but without the GTK bloat */
-static char **
-nskolibri_init_resource(const char *resource_path)
+static char **nskolibri_init_resource(const char *resource_path)
 {
   char **langv = {"de", "en_US", "en", "C"};
   char **pathv; /* resource path string vector */
@@ -191,7 +198,7 @@ extern struct http_msg;
 /*       return ret; */
 /*     } */
 
-/*     respaths = nskolibri_init_resource("/usbhd0/1/gtk/res"); */
+//respaths = nskolibri_init_resource("/usbhd0/1/kolibrios/fb/res");
 /*     debug_board_write_str("Initializing Netsurf Core."); */
 
 /*     ret = nsoption_init(set_defaults, &nsoptions, &nsoptions_default); */
@@ -348,8 +355,13 @@ main(int argc, char** argv)
     /*   die("unable to process command line.\n"); */
 
     /* Move the initialization stuff from process_cmdline() to here */
-    fename = "sdl";
-    febpp = 24;
+    /* fename = "sdl"; */
+
+    extern nsfb_surface_rtns_t kolibri_rtns;
+    _nsfb_register_surface(NSFB_SURFACE_KOLIBRI, &kolibri_rtns, "kolibri");
+    
+    fename = "kolibri";
+    febpp = 32;
 
     /* fewidth = nsoption_int(window_width); */
     /* if (fewidth <= 0) { */
@@ -363,8 +375,7 @@ main(int argc, char** argv)
     
     fewidth = 800;
     feheight = 600;
-
-    feurl = "http://www.kolibrios.org";
+    feurl = "http://www.kolibrios.org/en/";
 
     nsfb = framebuffer_initialise(fename, fewidth, feheight, febpp);
     if (nsfb == NULL)
@@ -394,14 +405,18 @@ main(int argc, char** argv)
 				  &bw);
       nsurl_unref(url);
     }
+
     if (ret != NSERROR_OK) {
       warn_user(messages_get_errorcode(ret), 0);
     } else {
       debug_board_write_str("calling framebuffer run\n");
-      __asm__ __volatile__("int3");
+      //      __asm__ __volatile__("int3");
+
       framebuffer_run();
+
       debug_board_write_str("framebuffer run returned. \n");
 
+      debug_board_write_str("Killing browser window.\n");
       browser_window_destroy(bw);
     }
 
