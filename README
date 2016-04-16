@@ -58,3 +58,23 @@ OR post to the Official Netsurf thread: http://board.kolibrios.org/viewtopic.php
 OR Send a PM to ashmew2 on board.kolibrios.org
 
 Have FUN!
+
+
+====
+ISSUES
+====
+
+free() crashes for favicon string in url_unescape() function.
+       It is disabled for now, but we need it sooner or later.
+
+We first download all data and then inform the core. This should be done as the chunks are received
+This will help the overall latency.
+
+There are too many debug statements around the code (including libs), remove them.
+
+Colours are messed up right now, somehow the RED component is missing. Probably something wrong in the
+kolibri surface for libnsfb.
+
+Entry boxes do not load.
+board.kolibrios.org crashes after some time.
+Might crash for some sites (Especially for 404s).
