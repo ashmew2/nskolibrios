@@ -43,7 +43,8 @@ KolibriOS, so that /hdX/Y/kolibri.lbl and /hdX/Y/kolibrios/, or
 KolibriOS. And yes, this is a sacred knowledge not present in the 
 documentation." - http://board.kolibrios.org/viewtopic.php?f=23&t=2865&p=58495&hilit=.lbl#p58495
 
-Once you have tset up these directories, you can execute KolibriOS and 
+
+Once you have set up these directories, you can execute KolibriOS and 
 run the nsbin executable.
 
 I usually use this as the command to run my qemu instance of Kolibri:
@@ -64,17 +65,28 @@ Have FUN!
 ISSUES
 ====
 
-free() crashes for favicon string in url_unescape() function.
-       It is disabled for now, but we need it sooner or later.
-
 We first download all data and then inform the core. This should be done as the chunks are received
 This will help the overall latency.
 
-There are too many debug statements around the code (including libs), remove them.
-
-Colours are messed up right now, somehow the RED component is missing. Probably something wrong in the
+===FIXED=== Colours are messed up right now, somehow the RED component is missing. Probably something wrong in the
 kolibri surface for libnsfb.
+
+No images load yet.
 
 Entry boxes do not load.
 board.kolibrios.org crashes after some time.
 Might crash for some sites (Especially for 404s).
+
+No POST yet. Only GET.
+
+No FileSystem caching yet. Need to enable FS Backing Store.
+The caching can be enabled later when everything else is Working 100%.
+
+free() crashes for favicon string in url_unescape() function.
+       It is disabled for now, but we need it sooner or later.
+
+There are too many debug statements around the code (including libs), remove them.
+
+Downloads probably won't work right now [ Untested, but best guessed ]
+
+No libiconv.
