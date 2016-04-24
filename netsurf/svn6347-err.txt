@@ -1,0 +1,164 @@
+*   0% 1) build-rus/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o video/menuetos/SDL_menuetevents.o video/menuetos/SDL_menuetevents.c
+video/menuetos/SDL_menuetevents.c:1:21: fatal error: kos32sys.h: No such file or directory
+ #include<kos32sys.h>
+                     ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=146919 failed with return value 1
+tup error: Expected to write to file 'video/menuetos/SDL_menuetevents.o' from cmd 146919 but didn't
+ *** Additionally, command 146919 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*   2% 5) build-et/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o video/menuetos/SDL_menuetvideo.o video/menuetos/SDL_menuetvideo.c
+video/menuetos/SDL_menuetvideo.c:3:22: fatal error: kos32sys.h: No such file or directory
+ #include <kos32sys.h>
+                      ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=147025 failed with return value 1
+tup error: Expected to write to file 'video/menuetos/SDL_menuetvideo.o' from cmd 147025 but didn't
+ *** Additionally, command 147025 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*   3% 6) build-rus/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o video/menuetos/SDL_menuetvideo.o video/menuetos/SDL_menuetvideo.c
+video/menuetos/SDL_menuetvideo.c:3:22: fatal error: kos32sys.h: No such file or directory
+ #include <kos32sys.h>
+                      ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=146921 failed with return value 1
+tup error: Expected to write to file 'video/menuetos/SDL_menuetvideo.o' from cmd 146921 but didn't
+ *** Additionally, command 146921 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*   3% 7) build-sp/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o video/menuetos/SDL_menuetvideo.o video/menuetos/SDL_menuetvideo.c
+video/menuetos/SDL_menuetvideo.c:3:22: fatal error: kos32sys.h: No such file or directory
+ #include <kos32sys.h>
+                      ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=147123 failed with return value 1
+tup error: Expected to write to file 'video/menuetos/SDL_menuetvideo.o' from cmd 147123 but didn't
+ *** Additionally, command 147123 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*   4% 8) build-rus/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o audio/SDL_kolibri_audio.o audio/SDL_kolibri_audio.c
+audio/SDL_kolibri_audio.c:2:22: fatal error: kos32sys.h: No such file or directory
+ #include <kos32sys.h>
+                      ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=146843 failed with return value 1
+tup error: Expected to write to file 'audio/SDL_kolibri_audio.o' from cmd 146843 but didn't
+ *** Additionally, command 146843 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*   5% 12) build-et/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o audio/SDL_kolibri_audio.o audio/SDL_kolibri_audio.c
+audio/SDL_kolibri_audio.c:2:22: fatal error: kos32sys.h: No such file or directory
+ #include <kos32sys.h>
+                      ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=146947 failed with return value 1
+tup error: Expected to write to file 'audio/SDL_kolibri_audio.o' from cmd 146947 but didn't
+ *** Additionally, command 146947 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*   6% 13) build-sp/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o audio/SDL_kolibri_audio.o audio/SDL_kolibri_audio.c
+audio/SDL_kolibri_audio.c:2:22: fatal error: kos32sys.h: No such file or directory
+ #include <kos32sys.h>
+                      ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=147045 failed with return value 1
+tup error: Expected to write to file 'audio/SDL_kolibri_audio.o' from cmd 147045 but didn't
+ *** Additionally, command 147045 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*   6% 15) build-eng/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o audio/SDL_kolibri_audio.o audio/SDL_kolibri_audio.c
+audio/SDL_kolibri_audio.c:2:22: fatal error: kos32sys.h: No such file or directory
+ #include <kos32sys.h>
+                      ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=147143 failed with return value 1
+tup error: Expected to write to file 'audio/SDL_kolibri_audio.o' from cmd 147143 but didn't
+ *** Additionally, command 147143 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*   7% 16) build-eng/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o video/menuetos/SDL_menuetvideo.o video/menuetos/SDL_menuetvideo.c
+video/menuetos/SDL_menuetvideo.c:3:22: fatal error: kos32sys.h: No such file or directory
+ #include <kos32sys.h>
+                      ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=147221 failed with return value 1
+tup error: Expected to write to file 'video/menuetos/SDL_menuetvideo.o' from cmd 147221 but didn't
+ *** Additionally, command 147221 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*   8% 17) build-it/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o video/menuetos/SDL_menuetvideo.o video/menuetos/SDL_menuetvideo.c
+video/menuetos/SDL_menuetvideo.c:3:22: fatal error: kos32sys.h: No such file or directory
+ #include <kos32sys.h>
+                      ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=147319 failed with return value 1
+tup error: Expected to write to file 'video/menuetos/SDL_menuetvideo.o' from cmd 147319 but didn't
+ *** Additionally, command 147319 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*   9% 18) build-it/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o audio/SDL_kolibri_audio.o audio/SDL_kolibri_audio.c
+audio/SDL_kolibri_audio.c:2:22: fatal error: kos32sys.h: No such file or directory
+ #include <kos32sys.h>
+                      ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=147241 failed with return value 1
+tup error: Expected to write to file 'audio/SDL_kolibri_audio.o' from cmd 147241 but didn't
+ *** Additionally, command 147241 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*  10% 19) build-ca/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o audio/SDL_kolibri_audio.o audio/SDL_kolibri_audio.c
+audio/SDL_kolibri_audio.c:2:22: fatal error: kos32sys.h: No such file or directory
+ #include <kos32sys.h>
+                      ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=237807 failed with return value 1
+tup error: Expected to write to file 'audio/SDL_kolibri_audio.o' from cmd 237807 but didn't
+ *** Additionally, command 237807 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*  11% 20) build-ca/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o video/menuetos/SDL_menuetvideo.o video/menuetos/SDL_menuetvideo.c
+video/menuetos/SDL_menuetvideo.c:3:22: fatal error: kos32sys.h: No such file or directory
+ #include <kos32sys.h>
+                      ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=237915 failed with return value 1
+tup error: Expected to write to file 'video/menuetos/SDL_menuetvideo.o' from cmd 237915 but didn't
+ *** Additionally, command 237915 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*  12% 23) build-et/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o video/menuetos/SDL_menuetevents.o video/menuetos/SDL_menuetevents.c
+video/menuetos/SDL_menuetevents.c:1:21: fatal error: kos32sys.h: No such file or directory
+ #include<kos32sys.h>
+                     ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=147023 failed with return value 1
+tup error: Expected to write to file 'video/menuetos/SDL_menuetevents.o' from cmd 147023 but didn't
+ *** Additionally, command 147023 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*  13% 24) build-it/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o video/menuetos/SDL_menuetevents.o video/menuetos/SDL_menuetevents.c
+video/menuetos/SDL_menuetevents.c:1:21: fatal error: kos32sys.h: No such file or directory
+ #include<kos32sys.h>
+                     ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=147317 failed with return value 1
+tup error: Expected to write to file 'video/menuetos/SDL_menuetevents.o' from cmd 147317 but didn't
+ *** Additionally, command 147317 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*  13% 25) build-sp/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o video/menuetos/SDL_menuetevents.o video/menuetos/SDL_menuetevents.c
+video/menuetos/SDL_menuetevents.c:1:21: fatal error: kos32sys.h: No such file or directory
+ #include<kos32sys.h>
+                     ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=147121 failed with return value 1
+tup error: Expected to write to file 'video/menuetos/SDL_menuetevents.o' from cmd 147121 but didn't
+ *** Additionally, command 147121 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*  15% 26) build-ca/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o video/menuetos/SDL_menuetevents.o video/menuetos/SDL_menuetevents.c
+video/menuetos/SDL_menuetevents.c:1:21: fatal error: kos32sys.h: No such file or directory
+ #include<kos32sys.h>
+                     ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=237913 failed with return value 1
+tup error: Expected to write to file 'video/menuetos/SDL_menuetevents.o' from cmd 237913 but didn't
+ *** Additionally, command 237913 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+*  15% 27) build-eng/contrib/sdk/sources/SDL-1.2.2/src: kos32-gcc -c -Os -mpreferred-stack-boundary=2 -fno-ident -fomit-frame-pointer -fno-stack-check -fno-stack-protector -mno-stack-arg-probe -fno-exceptions -fno-asynchronous-unwind-tables -ffast-math -mno-ms-bitfields -march=pentium-mmx -D_REENTRANT -DPACKAGE="SDL" -DVERSION="1.2.2" -DENABLE_AUDIO -UDISABLE_AUDIO -DDISABLE_JOYSTICK -DDISABLE_CDROM -DDISABLE_THREADS -DENABLE_TIMERS -DUSE_ASMBLIT -DENABLE_MENUETOS -DNO_SIGNAL_H -DDISABLE_STDIO -DNEED_SDL_GETENV -DENABLE_FILE -UDISABLE_FILE -D__MENUETOS__ -DDEBUG_VIDEO -UWIN32  -I../../../../../programs/develop/libraries/menuetlibc/include -I../../../../../programs/develop/sdk/trunk/sound/include -I. -I../include -Ihermes -Iaudio -Ivideo -Ievents -Ijoystick -Icdrom -Ithread -Itimer -Iendian -Ifile -o video/menuetos/SDL_menuetevents.o video/menuetos/SDL_menuetevents.c
+video/menuetos/SDL_menuetevents.c:1:21: fatal error: kos32sys.h: No such file or directory
+ #include<kos32sys.h>
+                     ^
+compilation terminated.
+ *** tup errors ***
+ *** Command ID=147219 failed with return value 1
+tup error: Expected to write to file 'video/menuetos/SDL_menuetevents.o' from cmd 147219 but didn't
+ *** Additionally, command 147219 failed to process input dependencies. These should probably be fixed before addressing the command failure.
+ *** tup: 18 jobs failed.
+ *** tup: Remaining nodes skipped due to errors in command execution.
