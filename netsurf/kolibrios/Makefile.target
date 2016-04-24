@@ -1,0 +1,160 @@
+NETSURF_FEATURE_NSSVG_CFLAGS := -DWITH_NS_SVG
+NETSURF_FEATURE_ROSPRITE_CFLAGS := -DWITH_NSSPRITE
+NETSURF_FEATURE_BMP_CFLAGS := -DWITH_BMP
+NETSURF_FEATURE_GIF_CFLAGS := -DWITH_GIF
+NETSURF_FEATURE_PNG_CFLAGS := -DWITH_PNG
+NETSURF_FEATURE_JS_CFLAGS := -DWITH_JS -DJS_HAS_FILE_OBJECT=0
+NETSURF_FEATURE_MOZJS_CFLAGS := -DWITH_MOZJS -DJS_HAS_FILE_OBJECT=0
+
+CWARNFLAGS += -Wno-error
+
+CFLAGS += -c -I/home/bob/kolibrios/contrib/sdk/sources/newlib/libc/include -I/home/bob/dev-netsurf/workspace/inst/include -I/home/bob/kolibrios/contrib/sdk/sources/libpng/ -I/home/bob/kolibrios/contrib/sdk/sources/zlib -I/home/bob/kolibrios/contrib/sdk/sources/freetype/include -I/home/bob/kolibrios/contrib/sdk/sources/freetype/include -I/home/bob/dev-netsurf/workspace/libiconv/libiconv-1.14 \
+       	  -std=c99 -D_KOLIBRIOS -Dnskolibrios -g \
+	  -Wundef \
+	  -U_Win32 -U_WIN32 -U__MINGW32__ \
+	  -U__BSD_VISIBLE \
+	  -D_BSD_SOURCE \
+	  -D_DEFAULT_SOURCE \
+	  -D_XOPEN_SOURCE=700 \
+	  -D_POSIX_C_SOURCE=200809L \
+	  -D_NETBSD_SOURCE \
+	  -UHAVE_UTSNAME -DKOLIBRIOS_RESPATH=\"$(NETSURF_KOLIBRIOS_RESOURCES)\" \
+	  -DFB_USE_FREETYPE
+
+
+#FONTS CFLAGS from Makefile.target in framebuffer.
+
+CFLAGS += '-DNETSURF_FB_FONTPATH="$(NETSURF_FB_FONTPATH)"'
+CFLAGS += '-DNETSURF_FB_FONT_SANS_SERIF="$(NETSURF_FB_FONT_SANS_SERIF)"'
+CFLAGS += '-DNETSURF_FB_FONT_SANS_SERIF_BOLD="$(NETSURF_FB_FONT_SANS_SERIF_BOLD)"'
+CFLAGS += '-DNETSURF_FB_FONT_SANS_SERIF_ITALIC="$(NETSURF_FB_FONT_SANS_SERIF_ITALIC)"'
+CFLAGS += '-DNETSURF_FB_FONT_SANS_SERIF_ITALIC_BOLD="$(NETSURF_FB_FONT_SANS_SERIF_ITALIC_BOLD)"'
+CFLAGS += '-DNETSURF_FB_FONT_SERIF="$(NETSURF_FB_FONT_SERIF)"'
+CFLAGS += '-DNETSURF_FB_FONT_SERIF_BOLD="$(NETSURF_FB_FONT_SERIF_BOLD)"'
+CFLAGS += '-DNETSURF_FB_FONT_MONOSPACE="$(NETSURF_FB_FONT_MONOSPACE)"'
+CFLAGS += '-DNETSURF_FB_FONT_MONOSPACE_BOLD="$(NETSURF_FB_FONT_MONOSPACE_BOLD)"'
+CFLAGS += '-DNETSURF_FB_FONT_CURSIVE="$(NETSURF_FB_FONT_CURSIVE)"'
+CFLAGS += '-DNETSURF_FB_FONT_FANTASY="$(NETSURF_FB_FONT_FANTASY)"'
+
+FB_IMAGE_left_arrow := kolibrios/res/icons/back.png
+FB_IMAGE_right_arrow := kolibrios/res/icons/forward.png
+FB_IMAGE_reload := kolibrios/res/icons/reload.png
+FB_IMAGE_stop_image := kolibrios/res/icons/stop.png
+FB_IMAGE_history_image := kolibrios/res/icons/history.png
+
+FB_IMAGE_left_arrow_g := kolibrios/res/icons/back_g.png
+FB_IMAGE_right_arrow_g := kolibrios/res/icons/forward_g.png
+FB_IMAGE_reload_g := kolibrios/res/icons/reload_g.png
+FB_IMAGE_stop_image_g := kolibrios/res/icons/stop_g.png
+FB_IMAGE_history_image_g := kolibrios/res/icons/history_g.png
+
+FB_IMAGE_scrolll := kolibrios/res/icons/scrolll.png
+FB_IMAGE_scrollr := kolibrios/res/icons/scrollr.png
+FB_IMAGE_scrollu := kolibrios/res/icons/scrollu.png
+FB_IMAGE_scrolld := kolibrios/res/icons/scrolld.png
+
+FB_IMAGE_osk_image := kolibrios/res/icons/osk.png
+
+FB_IMAGE_pointer_image := kolibrios/res/pointers/default.png
+FB_IMAGE_hand_image := kolibrios/res/pointers/point.png
+FB_IMAGE_caret_image := kolibrios/res/pointers/caret.png
+FB_IMAGE_menu_image := kolibrios/res/pointers/menu.png
+FB_IMAGE_progress_image := kolibrios/res/pointers/progress.png
+FB_IMAGE_move_image := kolibrios/res/pointers/move.png
+
+FB_IMAGE_throbber0 := kolibrios/res/throbber/throbber0.png
+FB_IMAGE_throbber1 := kolibrios/res/throbber/throbber1.png
+FB_IMAGE_throbber2 := kolibrios/res/throbber/throbber2.png
+FB_IMAGE_throbber3 := kolibrios/res/throbber/throbber3.png
+FB_IMAGE_throbber4 := kolibrios/res/throbber/throbber4.png
+FB_IMAGE_throbber5 := kolibrios/res/throbber/throbber5.png
+FB_IMAGE_throbber6 := kolibrios/res/throbber/throbber6.png
+FB_IMAGE_throbber7 := kolibrios/res/throbber/throbber7.png
+FB_IMAGE_throbber8 := kolibrios/res/throbber/throbber8.png
+
+# Host tool to convert image bitmaps to source code.
+#
+# convert_image depends on fb_bitmap.h so that if we change that
+# header, we get new images built.
+
+HOST_LDFLAGS += -lpng
+
+$(TOOLROOT)/convert_image: $(TOOLROOT)/created kolibrios/fb/convert_image.c kolibrios/fb/fbtk.h
+	$(Q)$(HOST_CC) $(HOST_CFLAGS) -o $@ kolibrios/fb/convert_image.c $(HOST_LDFLAGS)
+	
+# 1: input file
+# 2: output file
+# 3: bitmap name
+
+define convert_image
+
+S_IMAGES += $(2)
+
+$(2): $(1) $(TOOLROOT)/convert_image
+	$(Q)$(TOOLROOT)/convert_image $(1) $(2) $(3)
+endef
+
+S_IMAGES :=
+
+$(eval $(foreach V,$(filter FB_IMAGE_%,$(.VARIABLES)),$(call convert_image,$($(V)),$(OBJROOT)/image-$(patsubst FB_IMAGE_%,%,$(V)).c,$(patsubst FB_IMAGE_%,%,$(V)))))
+
+
+# Internal fonts to generate
+FB_FONT_internal_ns-sans := framebuffer/res/fonts/glyph_data
+
+# Internal font conversion
+$(TOOLROOT)/convert_font: $(TOOLROOT)/created framebuffer/convert_font.c
+	$(VQ)echo " HOST CC: $@"
+	$(Q)$(HOST_CC) -o $@ framebuffer/convert_font.c
+
+# 1: input file
+# 2: output source code file
+# 3: output header file
+# 4: font name
+define convert_font
+
+S_FONTS += $(2)
+
+$(2): $(1) $(TOOLROOT)/convert_font
+	$(VQ)echo "    FONT: $(1) ($(4))"
+	$(Q)$(TOOLROOT)/convert_font -H $(3) $(1) $(2)
+
+endef
+
+S_FONTS :=
+
+$(eval $(foreach V,$(filter FB_FONT_$(NETSURF_FB_FONTLIB)_%,$(.VARIABLES)),$(call convert_font,$($(V)),$(OBJROOT)/font-$(patsubst FB_FONT_$(NETSURF_FB_FONTLIB)_%,%,$(V)).c,$(OBJROOT)/font-$(patsubst FB_FONT_$(NETSURF_FB_FONTLIB)_%,%,$(V)).h,$(patsubst FB_FONT_$(NETSURF_FB_FONTLIB)_%,%,$(V)))))
+
+
+LDFLAGS := -T/home/bob/kolibrios/contrib/sdk/sources/newlib/libc/app.lds -nostdlib -static --image-base 0 -L/home/autobuild/tools/win32/mingw32/lib -lgcc /home/autobuild/tools/win32/lib/libfreetype.a /home/autobuild/tools/win32/lib/libz.a /home/autobuild/tools/win32/lib/libdll.a /home/autobuild/tools/win32/lib/libapp.a /home/bob/dev-netsurf/workspace/inst/lib/libcss.a /home/bob/dev-netsurf/workspace/inst/lib/libdom.a /home/bob/dev-netsurf/workspace/inst/lib/libhubbub.a /home/bob/dev-netsurf/workspace/inst/lib/libnsbmp.a /home/bob/dev-netsurf/workspace/inst/lib/libnsfb.a /home/bob/dev-netsurf/workspace/inst/lib/libnsgif.a /home/bob/dev-netsurf/workspace/inst/lib/libnsutils.a /home/bob/dev-netsurf/workspace/inst/lib/libparserutils.a /home/bob/dev-netsurf/workspace/inst/lib/libutf8proc.a /home/bob/dev-netsurf/workspace/inst/lib/libwapcaplet.a /home/autobuild/tools/win32/lib/libiconv.a /home/autobuild/tools/win32/lib/libc.dll.a
+
+# non optional pkg-configed libs
+#$(eval $(call pkg_config_find_and_add,libcurl,Curl ))
+#$(eval $(call pkg_config_find_and_add,openssl,OpenSSL))
+#$(eval $(call pkg_config_find_and_add,glib-2.0,GLib2))
+
+# optional pkg-config configured libraries
+$(eval $(call pkg_config_find_and_add_enabled,NSSVG,libsvgtiny,SVG))
+$(eval $(call pkg_config_find_and_add_enabled,ROSPRITE,librosprite,Sprite))
+$(eval $(call pkg_config_find_and_add_enabled,BMP,libnsbmp,BMP))
+$(eval $(call pkg_config_find_and_add_enabled,GIF,libnsgif,GIF))
+#$(eval $(call pkg_config_find_and_add_enabled,PNG,libpng,PNG  ))
+$(eval $(call pkg_config_find_and_add_enabled,MOZJS,mozjs185,JavaScript))
+$(eval $(call pkg_config_find_and_add_enabled,JS,mozilla-js,JavaScript))
+
+S_KOLIBRIOS := main.c kolibri_misc.c kolibri_debug.c kolibri_filesystem.c kolibri_regex.c kolibri_http.c 
+
+S_KOLIBRIOS := $(addprefix kolibrios/,$(S_KOLIBRIOS))
+
+S_FRAMEBUFFER := gui.c framebuffer.c schedule.c misc.c bitmap.c fetch.c	findfile.c localhistory.c clipboard.c
+S_FRAMEBUFFER_FBTK := fbtk.c event.c fill.c bitmap.c user.c window.c text.c scroll.c osk.c
+S_FRAMEBUFFER += font_$(NETSURF_FB_FONTLIB).c
+
+S_FRAMEBUFFER := $(addprefix kolibrios/fb/,$(S_FRAMEBUFFER)) $(addprefix kolibrios/fb/fbtk/,$(S_FRAMEBUFFER_FBTK))
+
+SOURCES = $(S_COMMON) $(S_IMAGE) $(S_BROWSER) $(S_KOLIBRIOS) $(S_FRAMEBUFFER) $(S_IMAGES)
+$(VQ)echo " SOURCES are : $(S_IMAGES)"
+
+EXETARGET := nskolibrios
+
+install-kolibri:
