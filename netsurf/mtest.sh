@@ -1,4 +1,0 @@
-kos32-gcc -c -I/home/bob/kolibrios/contrib/sdk/sources/newlib/libc/include -I/home/bob/kolibrios/contrib/sdk/sources/libpng/ -I/home/bob/kolibrios/contrib/sdk/sources/zlib -I/home/bob/kolibrios/contrib/sdk/sources/freetype/include -I/home/bob/kolibrios/contrib/sdk/sources/freetype/include -I/home/bob/kolibrios/contrib/sdk/sources/SDL-1.2.2/include/ -std=c99 -D_KOLIBRIOS -Dnskolibrios -g   -Wundef   -U_Win32 -U_WIN32 -U__MINGW32__ SDLTest.c
-kos32-ld SDLTest.o -T/home/bob/kolibrios/contrib/sdk/sources/newlib/libc/app.lds -nostdlib -static --image-base 0 -lgcc -L/home/autobuild/tools/win32/mingw32/lib /home/autobuild/tools/win32/lib/libdll.a /home/autobuild/tools/win32/lib/libapp.a /home/autobuild/tools/win32/lib/libSDL.a /home/autobuild/tools/win32/lib/libc.dll.a -static -o sdltest
-objcopy -O binary sdltest
-ls -l sdltest

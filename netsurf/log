@@ -1,7 +1,0 @@
-bob@h4xX0r-r3b0rn ~/dev-netsurf/workspace/netsurf/build-Linux-kolibrios $ kos32-gcc x.c -nostdlib -o x.o
-/tmp/cc3mLJ5k.o:x.c:(.text+0xa): undefined reference to `__main'
-/tmp/cc3mLJ5k.o:x.c:(.text+0x26): undefined reference to `open'
-/home/autobuild/tools/win32/lib/gcc/mingw32/4.8.2/../../../../mingw32/bin/ld: /tmp/cc3mLJ5k.o: bad reloc address 0x20 in section `.eh_frame'
-/home/autobuild/tools/win32/lib/gcc/mingw32/4.8.2/../../../../mingw32/bin/ld: final link failed: Invalid operation
-collect2: error: ld returned 1 exit status
-
