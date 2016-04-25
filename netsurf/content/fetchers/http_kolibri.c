@@ -560,10 +560,8 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	      fetch_send_callback(&msg, poller->fetch_handle);
 
 	      /* Abort the fetch if we got a 404. Otherwise we will keep polling it */
-	      if (http_code == 404) {
-		fetch_abort(poller->fetch_handle);
-		poller->abort = true;
-	      }
+	      fetch_abort(poller->fetch_handle);
+	      poller->abort = true;
 	    }
 	    
 	    if(poller->data_processed == true) {
