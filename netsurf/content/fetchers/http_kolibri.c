@@ -23,6 +23,7 @@ struct kolibri_fetch {
   http_type fetch_type;
   http_direction transfer_direction;
   char *url_string;
+  char *cookie_string;
   size_t url_length;
   int content_length;
   bool redirected;
@@ -132,6 +133,7 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
   new_kfetcher -> headers_processed = false;
   new_kfetcher -> url_string = NULL;
   new_kfetcher -> redirected = false;
+  new_kfetcher -> cookie_string = NULL;
   
   char *header_creator = new_kfetcher->headers;
   int total_length_headers = 0;
@@ -150,6 +152,12 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
     /* +1 for the NULL byte */
 
     total_length_headers += (2*header_count + 1);
+
+    new_kfetcher->cookie_string = urldb_get_cookie(url, true);
+
+    if(new_kfetcher->cookie_string)
+      total_length_headers += (8 + strlen(new_kfetcher->cookie_string) + 2);
+
     header_creator = (char *)malloc(total_length_headers);
     
     if(header_creator == NULL) {
@@ -174,6 +182,21 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
       *header_creator = '\r';
       header_creator++;      
     }
+
+    /* If we have a cookie set for this URL, use it */
+    if(new_kfetcher->cookie_string) {
+      debug_board_write_str("Found cookie!");
+      debug_board_write_str(new_kfetcher->cookie_string);
+      debug_board_write_str("\n");
+
+      __asm__ __volatile__("int3");
+      
+      strcpy(header_creator, "Cookie: ");
+      header_creator += 8;
+      strcpy(header_creator, new_kfetcher->cookie_string);
+      header_creator += strlen(new_kfetcher->cookie_string);
+    }
+
     *header_creator = 0;
 
     char datax[100];
@@ -421,41 +444,47 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 		debug_board_write_str("Do FETCH_HEADER\n");
 		msg.type = FETCH_HEADER;
 
-
-		header = (const uint8_t *)(&(poller -> http_handle -> http_header));
-		header_length  = (size_t) poller -> http_handle -> header_length;
-
 		/* msg.data.header_or_data.len = (size_t) poller -> http_handle -> header_length; */
 		/* msg.data.header_or_data.buf = (const uint8_t *)(&(poller -> http_handle -> http_header)); */
+
 		debug_board_write_str("Remove board log file\n");
 		__asm__ __volatile__("int3");
+		char *headers_copy = NULL;
+		
+		if(headers_copy = (char *)malloc(poller->http_handle->header_length + 1)) {
 
-		for(i = 0, newline = 0;i < header_length; i++)
-		  {
-		    if(header[i] == '\n')
+		  strncpy(headers_copy, (&(poller->http_handle->http_header)), poller->http_handle->header_length);
+		  headers_copy[poller->http_handle->header_length] = '\0';
+
+		  char *foo = strtok(headers_copy, "\r\n");
+
+		  while(foo!=NULL) {
+		    debug_board_write_str(foo);
+		    debug_board_write_str("\n");
+
+		    msg.data.header_or_data.len = strlen(foo);
+		    msg.data.header_or_data.buf = (const uint8_t *) foo;
+		    fetch_send_callback(&msg, poller->fetch_handle);
+
+		    if(!strncmp("set-cookie:", foo, 10))
 		      {
-			msg.data.header_or_data.len = i - newline;
-			msg.data.header_or_data.buf = (const uint8_t *) (header + newline);
-
-			char dataxx[200];
-			snprintf(dataxx, i-newline, "Feeding %s\n", msg.data.header_or_data.buf);
-			debug_board_write_str(dataxx);
-			__asm__ __volatile__("int3");
-		    
-			/* LOG(("buf inside send_header_cb is : %.*s\n", i - newline, header+newline)); */
-
-			newline = i+1;
-			fetch_send_callback(&msg, poller->fetch_handle);
+			fetch_set_cookie(poller->fetch_handle, foo+12);
 		      }
+		    foo = strtok(NULL, "\r\n");
+
 		  }
-		poller->headers_processed = true;
-
-		debug_board_write_str("Headers processed\n");
+		}
+		else {
+		  debug_board_write_str("Can't parse headers. Malloc failed.\n");
+		}
 		__asm__ __volatile__("int3");
-
 	      }
+	      poller->headers_processed = true;
 
-	      /* Only do FETCH_DATA if header processing is complete, otherwise dont */
+	      debug_board_write_str("Headers processed\n");
+	      __asm__ __volatile__("int3");
+
+	    /* Only do FETCH_DATA if header processing is complete, otherwise dont */
 	      if(poller->headers_processed == true) {
 
 		debug_board_write_str("Do FETCH_DATA\n");
