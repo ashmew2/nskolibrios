@@ -1,0 +1,40 @@
+STATICLIB = libiconv.a
+IMPLIB    = libiconv.dll.a
+
+CC = kos32-gcc
+LD = kos32-ld
+AR = kos32-ar
+STRIP = kos32-strip
+
+CFLAGS = $(LOC) -c -DHAVE_UNISTD_H -U_Win32 -U_WIN32 -U__MINGW32__ -O2 -Wall -fno-ident -fomit-frame-pointer 
+
+AS = $(CC)
+ASFLAGS = $(LOC) -Wall
+
+LDFLAGS = $(LOC)
+
+ARFLAGS = rcs
+
+LDFLAGS:=  -static -nostdlib -T /home/bob/kolibrios/contrib/sdk/sources/newlib/static.lds
+
+INCLUDES:= -I. -I.. -I../include -I./../include -I../srclib -I./../srclib -I../lib -I/home/bob/kolibrios/contrib/sdk/sources/newlib/libc/include
+
+LIBPATH:= -L/home/autobuild/tools/win32/lib
+
+LIBS:=  -ldll -lc.dll
+
+OBJS = iconv.o
+
+all: $(STATICLIB) Makefile
+
+iconv.o : iconv.c ../lib/iconv.c
+
+.c.o:
+	$(CC) $(CFLAGS) $(INCLUDES) -c -o $@ $<
+
+$(STATICLIB): $(OBJS) Makefile
+	$(AR) $(ARFLAGS) $@ $(OBJS)
+#	mv -f libz.a ../../lib
+
+
+

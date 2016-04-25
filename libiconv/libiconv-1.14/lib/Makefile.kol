@@ -1,0 +1,51 @@
+STATICLIB = libiconv.a
+IMPLIB    = libiconv.dll.a
+
+srcdir = .
+
+CC = kos32-gcc
+LD = kos32-ld
+AR = kos32-ar
+STRIP = kos32-strip
+
+CFLAGS = $(LOC) -c -DHAVE_UNISTD_H -U_Win32 -U_WIN32 -U__MINGW32__ -O2 -Wall -fno-ident -fomit-frame-pointer -U__CYGWIN__ -U_WIN32 -U__WIN32__ -UHAVE_LANGINFO_CODESET -UOS2
+
+AS = $(CC)
+ASFLAGS = $(LOC) -Wall
+
+LDFLAGS = $(LOC)
+
+ARFLAGS = rcs
+
+LDFLAGS:=  -static -nostdlib -T /home/bob/kolibrios/contrib/sdk/sources/newlib/static.lds
+
+INCLUDES:= -I. -I.. -I../include -I./../include -I../srclib -I./../srclib -I../lib -I/home/bob/kolibrios/contrib/sdk/sources/newlib/libc/include 
+
+LIBPATH:= -L/home/autobuild/tools/win32/lib
+
+LIBS:=  -ldll -lc.dll
+
+OBJS = iconv.o localcharset.o
+
+all: $(STATICLIB) Makefile
+
+$(STATICLIB): $(OBJS) Makefile
+	$(AR) $(ARFLAGS) $@ $(OBJS)
+#	mv -f libz.a ../../lib
+
+
+
+iconv.o : $(srcdir)/iconv.c $(srcdir)/converters.h \
+           $(srcdir)/encodings.def $(srcdir)/encodings_aix.def $(srcdir)/encodings_osf1.def $(srcdir)/encodings_dos.def $(srcdir)/encodings_local.def \
+           $(srcdir)/aliases.h aliases_aix_sysaix.h \
+           $(srcdir)/aliases_osf1.h $(srcdir)/aliases_osf1_sysosf1.h \
+           $(srcdir)/aliases_dos.h \
+           $(srcdir)/aliases_extra.h \
+           $(srcdir)/flags.h $(srcdir)/translit.h
+	$(CC) $(CFLAGS) $(INCLUDES) -c -o iconv.o iconv.c
+
+localcharset.o : $(srcdir)/../libcharset/lib/localcharset.c $(srcdir)/relocatable.h
+	$(CC) $(CFLAGS) $(INCLUDES) -c -o localcharset.o $(srcdir)/../libcharset/lib/localcharset.c
+
+relocatable.o : $(srcdir)/relocatable.c $(srcdir)/relocatable.h
+	$(CC) $(INCLUDES) $(CFLAGS) -c relocatable.c -o localcharset.o

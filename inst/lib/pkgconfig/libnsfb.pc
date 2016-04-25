@@ -1,0 +1,11 @@
+prefix=/home/bob/dev-netsurf/workspace/inst
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libnsfb
+Description: Provides framebuffer access for netsurf.
+Version: 0.1.3
+
+Libs: -L${libdir} -lnsfb
+Cflags: -I${includedir}
