@@ -73,11 +73,17 @@ Handle Headers , especially cookies to handle maintaining sessions. Right now it
 
 ===FIXED=== Colours are messed up right now, somehow the RED component is missing. Probably something wrong in the
 
+Properly handle all return codes. We just abort fetch if http code is not 200 or 3xx.
+
+Crash with imgur.com
+
+No HTTPS (Half of the world uses it....Damn PolarSSL..)
+
 Handle TAB key to cycle through fields.
 
-kolibri surface for libnsfb.
+Polish and Finish kolibri surface for libnsfb.
 
-No images load yet.
+No image support yet.
 
 Entry boxes do not load.
 board.kolibrios.org crashes after some time.
@@ -95,4 +101,7 @@ There are too many debug statements around the code (including libs), remove the
 
 Downloads probably won't work right now [ Untested, but best guessed ]
 
-libiconv Port is ready. It works with Netsurf as well. Upload to SVN. Make size smaller. Strip useless crap from the big source code and take only what we want.
+==FIXED== Port libiconv 
+
+Upload libiconv port to SVN. Make size smaller. Strip useless crap from the big source code before it.
+
