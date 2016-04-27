@@ -180,12 +180,19 @@ void nslog_log(const char *file, const char *func, int ln, const char *format, .
 	va_list ap;
 	char log_board[300];
 
+	FILE * logfile = fopen("/tmp0/1/logs.txt", "a");
+
 	va_start(ap, format);
-	vsprintf(log_board, format, ap);
+	/* vsprintf(log_board, format, ap); */
+	vfprintf(logfile, format, ap);
 	va_end(ap);
 
-	debug_board_write_str(log_board);
-	debug_board_write_str("\n");
+	fprintf(logfile, "\n");
+	
+	fclose(logfile);
+
+	/* debug_board_write_str(log_board); */
+	/* debug_board_write_str("\n"); */
 
 	/* fprintf(logfile, "%s %s:%i %s: ", nslog_gettime(), file, ln, func); */
 	/* va_start(ap, format); */
