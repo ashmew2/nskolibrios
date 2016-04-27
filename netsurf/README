@@ -65,9 +65,9 @@ Have FUN!
 ISSUES
 ====
 
-We first download all data and then inform the core. This should be done as the chunks are received
-This will help the overall latency. Right now it takes a long while to load sites. I don't care about it as long as it
-shows everything and doesn't crash. Bear with me while I fix this up. This will be fixed towards the end when everything else works because otherwise debugging is more painful.
+Slow Page loading times.
+We first download all data and then inform the core. This should be done as the chunks are received to help overall latency.
+My priority is stability first then speed. Once I feel the HTTP and CSS loading and status code handling is stable, I will try to look into this. Not a priority at the moment IMHO.
 
 Handle Headers , especially cookies to handle maintaining sessions. Right now it'll just keep kicking you out if you try to log onto a site.
 
@@ -105,3 +105,6 @@ Downloads probably won't work right now [ Untested, but best guessed ]
 
 Upload libiconv port to SVN. Make size smaller. Strip useless crap from the big source code before it.
 
+Stop feeding HTTP Header line to core.
+
+Fix crash related to loading wiki.osdev.org (and other websites with PNGs)
