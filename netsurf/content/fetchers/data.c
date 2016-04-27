@@ -232,7 +232,9 @@ static bool fetch_data_process(struct fetch_data_context *c)
 		memcpy(c->data, unescaped, unescaped_len);
 	}
 	
-	free(unescaped);
+ /* FIXME: Should we use mcall 68,13 to free the buffer? Should we do strdup */
+ /*        and stay away from assembly madness ? :D  */
+	/* free(unescaped); */
 	
 	return true;
 }
@@ -241,7 +243,7 @@ static void fetch_data_poll(lwc_string *scheme)
 {
 	fetch_msg msg;
 	struct fetch_data_context *c, *next;
-	
+
 	if (ring == NULL) return;
 	
 	/* Iterate over ring, processing each pending fetch */
