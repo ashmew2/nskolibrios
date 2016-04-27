@@ -71,7 +71,9 @@ My priority is stability first then speed. Once I feel the HTTP and CSS loading 
 
 Handle Headers , especially cookies to handle maintaining sessions. Right now it'll just keep kicking you out if you try to log onto a site.
 
-===FIXED=== Colours are messed up right now, somehow the RED component is missing. Probably something wrong in the
+===FIXED=== Colours are messed up right now, somehow the RED component is missing. Probably something wrong in the pixel layout in memory.
+
+CSS Does not always load pretty graphics for the same website (For example board.kolibrios.org).
 
 Properly handle all return codes. We just abort fetch if http code is not 200 or 3xx.
 
@@ -108,3 +110,5 @@ Upload libiconv port to SVN. Make size smaller. Strip useless crap from the big 
 Stop feeding HTTP Header line to core.
 
 Fix crash related to loading wiki.osdev.org (and other websites with PNGs)
+
+Merge to CI of Netsurf.
