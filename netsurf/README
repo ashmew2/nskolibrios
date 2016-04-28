@@ -69,15 +69,15 @@ Slow Page loading times.
 We first download all data and then inform the core. This should be done as the chunks are received to help overall latency.
 My priority is stability first then speed. Once I feel the HTTP and CSS loading and status code handling is stable, I will try to look into this. Not a priority at the moment IMHO.
 
-Handle Headers , especially cookies to handle maintaining sessions. Right now it'll just keep kicking you out if you try to log onto a site.
+===FIXED=== Handle Headers , especially cookies to handle maintaining sessions. Right now it'll just keep kicking you out if you try to log onto a site.
 
 ===FIXED=== Colours are messed up right now, somehow the RED component is missing. Probably something wrong in the pixel layout in memory.
 
 CSS Does not always load pretty graphics for the same website (For example board.kolibrios.org).
 
-Properly handle all return codes. We just abort fetch if http code is not 200 or 3xx.
+===FIXED=== Properly handle all return codes. We just abort fetch if http code is not 200 or 3xx.
 
-Crash with imgur.com
+===FIXED=== Crash with imgur.com
 
 No HTTPS (Half of the world uses it....Damn PolarSSL..)
 
@@ -87,9 +87,11 @@ Polish and Finish kolibri surface for libnsfb.
 
 No image support yet.
 
-Entry boxes do not load.
-board.kolibrios.org crashes after some time.
-Might crash for some sites (Especially for 404s). This seems to be fixed now. A crash now would be useful.
+No Javascript.
+
+===FIXED=== Entry boxes do not load.
+===FIXED=== board.kolibrios.org crashes after some time.
+===FIXED=== Might crash for some sites (Especially for 404s). This seems to be fixed now. A crash now would be useful.
 
 ===FIXED=== No POST yet. Only GET.
 
@@ -109,8 +111,10 @@ Upload libiconv port to SVN. Make size smaller. Strip useless crap from the big 
 
 Stop feeding HTTP Header line to core.
 
-Fix crash related to loading wiki.osdev.org (and other websites with PNGs)
+===FIXED=== Fix crash related to loading wiki.osdev.org (and other websites with PNGs)
 
 Merge to CI of Netsurf.
 
 Add support for multipart/form-data POST requests.
+
+Add custom pages for 404 or 5xx errors like what "regular browsers" show. Designers! *Looks at Leency*
