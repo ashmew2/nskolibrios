@@ -404,6 +404,10 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	  /* debug_board_write_str(datax); */
 
 	  int x = http_receive_asm(poller->http_handle);
+
+	  if(!poller->headers_processed && (poller->http_handle->flags & HTTP_GOT_HEADER))
+	    	    process_headers(poller);
+
 	  if(x == 0)
 	    {
 	      poller->transfer_complete = true;
@@ -440,13 +444,11 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	  }
       }
 
-      if(!poller->redirected && (poller -> finished == false && poller->transfer_complete == true)) {
+      if((poller -> finished == false && poller->transfer_complete == true)) {
 	if(poller->transfer_direction == RECEIEVE)
 	  {
 	    fetch_msg msg;
 	    unsigned int http_code = poller->http_handle->status;
-
-	    process_headers(poller);
 	    fetch_set_http_code(poller->fetch_handle, http_code);
 
 	    if(http_code == 200) {
