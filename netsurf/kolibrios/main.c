@@ -375,8 +375,8 @@ main(int argc, char** argv)
     febpp = 32;
     fewidth = 800;
     feheight = 600;
-    feurl = "http://board.kolibrios.org/ucp.php?mode=login";
-    
+    feurl = "http://board.kolibrios.org/";
+    //    feurl = "wiki.osdev.org/Main_Page";
     nsfb = framebuffer_initialise(fename, fewidth, feheight, febpp);
     if (nsfb == NULL)
       die("Unable to initialise framebuffer");

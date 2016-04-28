@@ -1591,8 +1591,8 @@ static bool urldb_parse_avpair(struct cookie_internal_data *c, char *n,
 				datenoday++)
 			; /* do nothing */
 
-		debug_board_write_str(datenoday);
-		debug_board_write_str("\n");
+		/* debug_board_write_str(datenoday); */
+		/* debug_board_write_str("\n"); */
 
 		expires = kolibri_getdate(datenoday);
 		if (expires == -1) {

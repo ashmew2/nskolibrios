@@ -61,8 +61,8 @@
 #include "content/urldb.h"
 
 /* Define this to turn on verbose fetch logging */
-//#undef DEBUG_FETCH_VERBOSE
-#define DEBUG_FETCH_VERBOSE 1
+#undef DEBUG_FETCH_VERBOSE
+//#define DEBUG_FETCH_VERBOSE 1
 
 /** Verbose fetcher logging */
 #ifdef DEBUG_FETCH_VERBOSE
@@ -473,11 +473,11 @@ fetch_start(nsurl *url,
 		free(fetch);
 		return NSERROR_NO_FETCH_HANDLER;
 	}
-	debug_board_write_str("fetch.c: fetch_start\n");
-	debug_board_write_str(nsurl_access(url));
-	debug_board_write_str("\n");
-	debug_board_write_str(lwc_string_data(scheme));
-	debug_board_write_str("\n");
+	/* debug_board_write_str("fetch.c: fetch_start\n"); */
+	/* debug_board_write_str(nsurl_access(url)); */
+	/* debug_board_write_str("\n"); */
+	/* debug_board_write_str(lwc_string_data(scheme)); */
+	/* debug_board_write_str("\n"); */
 	
 	FETCH_LOG("fetch %p, url '%s'", fetch, nsurl_access(url));
 
@@ -578,7 +578,7 @@ fetch_start(nsurl *url,
 
 	*fetch_out = fetch;
 
-	debug_board_write_str("Returning from fetcH_start\n");
+	/* debug_board_write_str("Returning from fetcH_start\n"); */
 	return NSERROR_OK;
 }
 

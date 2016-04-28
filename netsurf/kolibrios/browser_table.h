@@ -20,7 +20,7 @@ static struct gui_browser_table kolibri_browser_table = {
 
 nserror kolibri_schedule_cb(int t, void (*callback)(void *p), void *p)
 {
-  debug_board_write_str("kolibri_schedule_cb called!\n");
+  /* debug_board_write_str("kolibri_schedule_cb called!\n"); */
   struct kolibri_callback *new_cb = malloc(sizeof(struct kolibri_callback));
   new_cb->arg = p;
   new_cb->cb = callback;

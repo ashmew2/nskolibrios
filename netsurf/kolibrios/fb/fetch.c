@@ -72,7 +72,7 @@ static const char *fetch_filetype(const char *unix_path)
 {
 	int l;
 	LOG("unix path %s", unix_path);
-	debug_board_write_str("Inside fetch_filetype!!!!!!!!!!!\n");
+	/* debug_board_write_str("Inside fetch_filetype!!!!!!!!!!!\n"); */
 	//	__asm__ __volatile__("int3");
 	
 	l = strlen(unix_path);

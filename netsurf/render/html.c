@@ -350,7 +350,7 @@ static nserror html_meta_refresh_process_element(html_content *c, dom_node *n)
 	dom_exception exc;
 	nsurl *nsurl;
 	nserror error = NSERROR_OK;
-	debug_board_write_str("html_meta-refresh_process_element");
+	//debug_board_write_str("html_meta-refresh_process_element");
 	exc = dom_element_get_attribute(n, corestring_dom_http_equiv, &equiv);
 	if (exc != DOM_NO_ERR) {
 		return NSERROR_DOM;
@@ -367,7 +367,7 @@ static nserror html_meta_refresh_process_element(html_content *c, dom_node *n)
 
 	dom_string_unref(equiv);
 
-	debug_board_write_str("html_meta-refresh_process_element 2x");
+	//debug_board_write_str("html_meta-refresh_process_element 2x");
 
 	exc = dom_element_get_attribute(n, corestring_dom_content, &content);
 	if (exc != DOM_NO_ERR) {
@@ -569,7 +569,7 @@ static bool html_process_img(html_content *c, dom_node *node)
 /* exported function documented in render/html_internal.h */
 void html_finish_conversion(html_content *htmlc)
 {
-  debug_board_write_str("html_finish_conversion called\n");
+  //debug_board_write_str("html_finish_conversion called\n");
 	union content_msg_data msg_data;
 	dom_exception exc; /* returned by libdom functions */
 	dom_node *html;
@@ -605,8 +605,8 @@ void html_finish_conversion(html_content *htmlc)
 
 	exc = dom_document_get_document_element(htmlc->document, (void *) &html);
 	if ((exc != DOM_NO_ERR) || (html == NULL)) {
-	  char data[50];
-	  debug_board_write_str("Called dom_document_get_document_element");
+	  /* char data[50]; */
+	  //debug_board_write_str("Called dom_document_get_document_element");
 
 	  LOG("error retrieving html element from dom");
 	  content_broadcast_errorcode(&htmlc->base, NSERROR_DOM);
@@ -926,7 +926,7 @@ html_create_html_data(html_content *c, const http_parameter *params)
 		c->universal = NULL;
 
 		LOG("Unable to set user data.");
-		debug_board_write_str("html_create_html_data. Unable to set user data.\n");
+		//debug_board_write_str("html_create_html_data. Unable to set user data.\n");
 
 		return NSERROR_DOM;
 	}
@@ -1131,7 +1131,7 @@ html_process_data(struct content *c, const char *data, unsigned int size)
 
 static bool html_convert(struct content *c)
 {
-  debug_board_write_str("Inside html_convert\n");
+  //debug_board_write_str("Inside html_convert\n");
 	html_content *htmlc = (html_content *) c;
 	dom_exception exc; /* returned by libdom functions */
 
@@ -1161,7 +1161,7 @@ static bool html_convert(struct content *c)
 	 * being fetched or they completed already.
 	 */
 	if (html_can_begin_conversion(htmlc)) {
-	  /* debug_board_write_str("L1156 html.c\n"); */
+	  /* //debug_board_write_str("L1156 html.c\n"); */
 	  /* ; */
 	  
 		return html_begin_conversion(htmlc);
@@ -1262,13 +1262,13 @@ html_begin_conversion(html_content *htmlc)
 	/* locate root element and ensure it is html */
 	exc = dom_document_get_document_element(htmlc->document, (void *) &html);
 	if ((exc != DOM_NO_ERR) || (html == NULL)) {
-	  if(html==NULL)
-	    debug_board_write_str("html is NULL\n");
-	  else
-	    debug_board_write_str("html is NOT NULL\n");
+	  /* if(html==NULL) */
+	  /*   debug_board_write_str("html is NULL\n"); */
+	  /* else */
+	  /*   debug_board_write_str("html is NOT NULL\n"); */
 
 		LOG("error retrieving html element from dom");
-		debug_board_write_str("html_begin conv. cannot retr from dom.");
+		/* debug_board_write_str("html_begin conv. cannot retr from dom."); */
 
 		content_broadcast_errorcode(&htmlc->base, NSERROR_DOM);
 		return false;
@@ -1280,7 +1280,7 @@ html_begin_conversion(html_content *htmlc)
 	    (!dom_string_caseless_lwc_isequal(node_name,
 	    		corestring_lwc_html))) {
 		LOG("root element not html");
-		debug_board_write_str("html_begin_conv: root is not html!\n");
+		/* debug_board_write_str("html_begin_conv: root is not html!\n"); */
 
 		content_broadcast_errorcode(&htmlc->base, NSERROR_DOM);
 		dom_node_unref(html);
@@ -2172,7 +2172,7 @@ html_debug_dump(struct content *c, FILE *f, enum content_debug op)
 	} else {
 		if (htmlc->document == NULL) {
 			LOG("No document to dump");
-			debug_board_write_str("html_debug_dump: no doc to dump!\n");
+			/* debug_board_write_str("html_debug_dump: no doc to dump!\n"); */
 
 			return NSERROR_DOM;
 		}
@@ -2180,7 +2180,7 @@ html_debug_dump(struct content *c, FILE *f, enum content_debug op)
 		exc = dom_document_get_document_element(htmlc->document, (void *) &html);
 		if ((exc != DOM_NO_ERR) || (html == NULL)) {
 			LOG("Unable to obtain root node");
-			debug_board_write_str("html_debug_dump: unable obtain root node.!\n");
+			/* debug_board_write_str("html_debug_dump: unable obtain root node.!\n"); */
 
 
 			return NSERROR_DOM;

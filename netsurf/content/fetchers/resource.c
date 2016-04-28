@@ -260,7 +260,7 @@ static bool fetch_resource_initialise(lwc_string *scheme)
 	struct fetch_resource_map_entry *e;
 	uint32_t i;
 	nserror res;
-	debug_board_write_str("Inside fetch_resource_initialise\n");
+	/* debug_board_write_str("Inside fetch_resource_initialise\n"); */
 
 	fetch_resource_path_count = 0;
 
@@ -339,7 +339,7 @@ fetch_resource_setup(struct fetch *fetchh,
 	lwc_string *path;
 	uint32_t i;
 
-	debug_board_write_str("Inside fetch_resource_setup \n");
+	/* debug_board_write_str("Inside fetch_resource_setup \n"); */
 	//	;
 	
 	ctx = calloc(1, sizeof(*ctx));
@@ -402,7 +402,7 @@ fetch_resource_setup(struct fetch *fetchh,
 
 	RING_INSERT(ring, ctx);
 
-	debug_board_write_str("Leaving fetch_resource_setup \n");
+	/* debug_board_write_str("Leaving fetch_resource_setup \n"); */
 	//	;
 	return ctx;
 }
@@ -420,7 +420,7 @@ static void fetch_resource_free(void *ctx)
 /** callback to start a resource fetch */
 static bool fetch_resource_start(void *ctx)
 {
-  debug_board_write_str("Inside fetch_resource_start\n");
+  /* debug_board_write_str("Inside fetch_resource_start\n"); */
 	return true;
 }
 

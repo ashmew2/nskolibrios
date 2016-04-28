@@ -146,16 +146,16 @@ fetch_file_setup(struct fetch *fetchh,
 	int i;
 	nserror ret;
 
-	debug_board_write_str("setup_file=============zzzzzzzzz==,\n");
+	/* debug_board_write_str("setup_file=============zzzzzzzzz==,\n"); */
 	//	__asm__ __volatile__("int3");
 	
 	ctx = calloc(1, sizeof(*ctx));
 	if (ctx == NULL)
 		return NULL;
 
-	debug_board_write_str("Calling nsurl_to_path\n");
+	/* debug_board_write_str("Calling nsurl_to_path\n"); */
 	ret = guit->file->nsurl_to_path(url, &ctx->path);
-	debug_board_write_str("Called nsurl_to_path\n");
+	/* debug_board_write_str("Called nsurl_to_path\n"); */
 	//	__asm__ __volatile__("int3");	
 	LOG("ctx->path = %s", ctx->path);
 	/* (+ 1 6) */
@@ -166,7 +166,7 @@ fetch_file_setup(struct fetch *fetchh,
 		return NULL;
 	}
 
-	debug_board_write_str(ctx -> path);
+	/* debug_board_write_str(ctx -> path); */
 	//	;
 
 	ctx->url = nsurl_ref(url);
@@ -208,7 +208,7 @@ static void fetch_file_free(void *ctx)
 /** callback to start a file fetch */
 static bool fetch_file_start(void *ctx)
 {
-  debug_board_write_str("Start a file fetch@@@@@@@@@@@@@@@@@@@@@@@\n");
+  /* debug_board_write_str("Start a file fetch@@@@@@@@@@@@@@@@@@@@@@@\n"); */
 	return true;
 }
 
@@ -280,9 +280,9 @@ fetch_file_process_error_aborted:
 static void fetch_file_process_plain(struct fetch_file_context *ctx,
 				     struct stat *fdstat)
 {
-  debug_board_write_str("process_plain! =>>>>>>");
-  debug_board_write_str(ctx->path);
-  debug_board_write_str("\n");
+  /* debug_board_write_str("process_plain! =>>>>>>"); */
+  /* debug_board_write_str(ctx->path); */
+  /* debug_board_write_str("\n"); */
   /* ; */
   
 #ifdef HAVE_MMAP
@@ -371,7 +371,7 @@ fetch_file_process_aborted:
 
 	FILE *infile;
 
-	debug_board_write_str("Check if can return not modified.");
+	/* debug_board_write_str("Check if can return not modified."); */
 	/* ; */
 
 	/* Check if we can just return not modified */
@@ -382,7 +382,7 @@ fetch_file_process_aborted:
 		return;
 	}
 
-	debug_board_write_str("fopen file.");
+	/* debug_board_write_str("fopen file."); */
 	/* ; */
 
 	infile = fopen(ctx->path, "rb");
@@ -394,7 +394,7 @@ fetch_file_process_aborted:
 		return;
 	}
 
-	debug_board_write_str("Set buffer size.");
+	/* debug_board_write_str("Set buffer size."); */
 	/* ; */
 
 	/* set buffer size */
@@ -792,7 +792,7 @@ static void fetch_file_poll(lwc_string *scheme)
 		/* Only process non-aborted fetches */
 		if (c->aborted == false) {
 			/* file fetches can be processed in one go */
-		  debug_board_write_str("Calling fetch_file_process\n");
+		  /* debug_board_write_str("Calling fetch_file_process\n"); */
 			fetch_file_process(c);
 		}
 
@@ -809,7 +809,7 @@ static void fetch_file_poll(lwc_string *scheme)
 		 */
 	} while ( (c = next) != ring && ring != NULL);
 	
-	debug_board_write_str("Leaving file poller\n");
+	/* debug_board_write_str("Leaving file poller\n"); */
 
 }
 

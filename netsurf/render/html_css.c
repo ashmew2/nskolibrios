@@ -184,7 +184,7 @@ html_stylesheet_from_domnode(html_content *c,
 		return error;
 	}
 
-        debug_board_write_str("calling hlcache_handle_retrieve Line 187");
+        /* debug_board_write_str("calling hlcache_handle_retrieve Line 187"); */
 	error = hlcache_handle_retrieve(url, 0,
 			content_get_url(&c->base), NULL,
 			html_convert_css_callback, c, &child, CONTENT_CSS,
@@ -421,7 +421,7 @@ bool html_css_process_link(html_content *htmlc, dom_node *node)
 	child.charset = htmlc->encoding;
 	child.quirks = htmlc->base.quirks;
 
-        debug_board_write_str("calling hlcache_handle_retrieve Line 424");
+        /* debug_board_write_str("calling hlcache_handle_retrieve Line 424"); */
 	ns_error = hlcache_handle_retrieve(joined, 0,
 			content_get_url(&htmlc->base),
 			NULL, html_convert_css_callback,
@@ -491,7 +491,7 @@ nserror html_css_quirks_stylesheets(html_content *c)
 		child.charset = c->encoding;
 		child.quirks = c->base.quirks;
 
-		debug_board_write_str("calling hlcache_handle_retrieve Line 494");
+		/* debug_board_write_str("calling hlcache_handle_retrieve Line 494"); */
 		ns_error = hlcache_handle_retrieve(html_quirks_stylesheet_url,
 				0, content_get_url(&c->base), NULL,
 				html_convert_css_callback, c, &child,
@@ -556,7 +556,7 @@ nserror html_css_new_stylesheets(html_content *c)
 
 
 	if (nsoption_bool(block_advertisements)) {
-	  debug_board_write_str("calling hlcache_handle_retrieve Line 554");
+	  /* debug_board_write_str("calling hlcache_handle_retrieve Line 554"); */
 		ns_error = hlcache_handle_retrieve(html_adblock_stylesheet_url,
 				0, content_get_url(&c->base), NULL,
 				html_convert_css_callback,
@@ -570,7 +570,7 @@ nserror html_css_new_stylesheets(html_content *c)
 		LOG("%d fetches active", c->base.active);
 
 	}
-        debug_board_write_str("calling hlcache_handle_retrieve Line 568");
+        /* debug_board_write_str("calling hlcache_handle_retrieve Line 568"); */
 	ns_error = hlcache_handle_retrieve(html_user_stylesheet_url, 0,
 			content_get_url(&c->base), NULL,
 			html_convert_css_callback, c, &child, CONTENT_CSS,

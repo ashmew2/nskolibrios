@@ -42,8 +42,8 @@
 
 
 /* Define to enable NSURL debugging */
-#define NSURL_DEBUG
-
+//#define NSURL_DEBUG
+#undef NSURL_DEBUG
 /**
  * Return a hex digit for the given numerical value.
  *
