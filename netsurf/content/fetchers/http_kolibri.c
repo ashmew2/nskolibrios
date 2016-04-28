@@ -10,6 +10,8 @@
 char *post_type_urlencoded = "application/x-www-form-urlencoded";
 char *post_type_multipart = "multipart/form-data";
 
+bool HEADER_DEBUG = true;
+
 typedef enum {SEND, RECEIEVE} http_direction;
 typedef enum {HTTP_GET, HTTP_POST} http_type;
 
@@ -25,6 +27,7 @@ struct kolibri_fetch {
   char *url_string;
   char *location;  /* Only useful when redirected. */
   char *cookie_string;
+  char *realm;
   size_t url_length;
   int content_length;
   bool redirected;
@@ -143,7 +146,8 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
   new_kfetcher -> redirected = false;
   new_kfetcher -> cookie_string = NULL;
   new_kfetcher -> location = NULL;
-
+  new_kfetcher -> realm = NULL;
+  
   char *header_creator = new_kfetcher->headers;
   int total_length_headers = 0;
   int header_count = 0;
@@ -461,42 +465,51 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	    else if (300 <= http_code && http_code < 400) {
 	      /* debug_board_write_str("Got redirect..."); */
 	      /* __asm__ __volatile__("int3"); */
+	      if(http_code == 301 || http_code == 302) {
+		if(poller->location) {
+		  msg.type = FETCH_REDIRECT;
 
-	      if(poller->location) {
-		msg.type = FETCH_REDIRECT;
-		msg.data.redirect = poller->location;
-		fetch_send_callback(&msg, poller->fetch_handle);
+  if (HEADER_DEBUG == true) {
+    debug_board_write_str("New location: ");
+    debug_board_write_str(poller->location);
+    debug_board_write_str("\n");
+  }
+		  msg.data.redirect = poller->location;
+		  fetch_send_callback(&msg, poller->fetch_handle);
+		}
+		else {
+		  debug_board_write_str("Got 3xx redirect but no target URL.");
+		  __asm__ __volatile__("int3");
+		}
 	      }
 	      else {
-		debug_board_write_str("Got 3xx. But no redirect URL.");
-		__asm__ __volatile__("int3");
+		/* Code is 3xx but not 301 or 302 */
 	      }
 	    }
-	    else if (http_code == 401) {
-	      msg.type = FETCH_AUTH;
-	      debug_board_write_str("We Don't know how to handle AUTH!\n");
-	      debug_board_write_str("Killing myself");
-	      exit(3);
+	    else if (400 <= http_code && http_code < 500) {
+	      if(http_code == 401) {
+		msg.type = FETCH_AUTH;
+		msg.data.auth.realm = poller->realm;
+		fetch_send_callback(&msg, poller->fetch_handle);
+	      }
+	      else if(http_code == 404) {
+		msg.type = FETCH_ERROR;
+		msg.data.error = messages_get("HTTP Code 404: Not found");
+		fetch_send_callback(&msg, poller->fetch_handle);
+		fetch_abort(poller->fetch_handle);
+	      }
+	    }
+	    else if (http_code >= 500 && http_code < 600) {
+	      msg.type = FETCH_ERROR;
+	      msg.data.error = messages_get("HTTP Code 5xx: Internal Server Errors.");
+	      fetch_send_callback(&msg, poller->fetch_handle);
+	      fetch_abort(poller->fetch_handle);
 	    }
 	    else {
-	      /* debug_board_write_str("Warning: Unhandled HTTP Code.\n"); */
-	      /* char datax[200]; */
-	      /* sprintf(datax, "Got : %u with Handle: %p\n for %s\n\n", */
-	      /* 	      poller->http_handle->status, poller->http_handle, poller->url_string); */
-	      /* debug_board_write_str(datax); */
-
 	      msg.type = FETCH_ERROR;
-	      msg.data.error = messages_get("Got 4xx or 5xx. Aborted.");
+	      msg.data.error = messages_get("Got Unknown HTTP Code. Aborting.");
 	      fetch_send_callback(&msg, poller->fetch_handle);
-
-	      /* debug_board_write_str("Aborting fetch..\n"); */
-
-	      /* __asm__ __volatile__("int3"); */
-	      /* Abort the fetch. Otherwise we will keep polling it */
-	      /* __asm__ __volatile__("int3"); */
 	      fetch_abort(poller->fetch_handle);
-	      /* poller->abort = true; */
-	      /* __asm__ __volatile__("int3"); */
 	    } /* End of handling http codes */
 
 	    if(poller->data_processed == true) {
@@ -728,6 +741,11 @@ void process_headers(struct kolibri_fetch *poller) {
 	/* debug_board_write_str(foo); */
 	/* debug_board_write_str("\n"); */
 
+	if(HEADER_DEBUG = true) {
+	debug_board_write_str(foo);
+	debug_board_write_str("\n");
+	}
+
 	msg.data.header_or_data.len = strlen(foo);
 	msg.data.header_or_data.buf = (const uint8_t *) foo;
 	fetch_send_callback(&msg, poller->fetch_handle);
@@ -739,6 +757,9 @@ void process_headers(struct kolibri_fetch *poller) {
 	    poller->location = strdup(foo + 10);
 	    poller->redirected = true;
 	  }
+	else if(!strncmp("realm:", foo, 6))
+		poller->realm = strdup(foo + 7);
+
 	foo = strtok(NULL, "\r\n");
       }
 
