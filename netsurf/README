@@ -112,3 +112,5 @@ Stop feeding HTTP Header line to core.
 Fix crash related to loading wiki.osdev.org (and other websites with PNGs)
 
 Merge to CI of Netsurf.
+
+Add support for multipart/form-data POST requests.
