@@ -55,4 +55,26 @@ extern char * (*http_unescape_asm)(char *, unsigned int) __attribute__((__stdcal
 
 int kolibri_http_init(void);
 
+#define HTTP_HTTP11             1 << 0
+#define HTTP_GOT_HEADER         1 << 1
+#define HTTP_GOT_ALL_DATA       1 << 2
+#define HTTP_CONTENT_LENGTH     1 << 3
+#define HTTP_CHUNKED            1 << 4
+#define HTTP_CONNECTED          1 << 5
+
+/* Flags for user options */
+#define HTTP_KEEPALIVE          1 << 8
+#define HTTP_STREAM             1 << 9
+#define HTTP_REUSE_BUFFER       1 << 10
+#define HTTP_BLOCK              1 << 11
+
+/* Flags for HTTP Errors */
+#define HTTP_INVALID_HEADER     1 << 16
+#define HTTP_NO_RAM             1 << 17
+#define HTTP_SOCKET_ERROR       1 << 18
+#define HTTP_TIMEOUT_ERROR      1 << 19
+#define HTTP_TRANSFER_FAILED    1 << 20
+
+
 #endif /* KOLIBRI_HTTP_H */
+
