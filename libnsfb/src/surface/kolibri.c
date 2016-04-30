@@ -289,7 +289,8 @@ int scan2key(int scan){
     if (keycode == 0x30) return NSFB_KEY_b;
     if (keycode == 0x31) return NSFB_KEY_n;
     if (keycode == 0x32) return NSFB_KEY_m;
-	
+    
+    /* TODO: Add a TAB Key here to cycle through fields */
     if (keycode == 0x27) return NSFB_KEY_SEMICOLON;
     if (keycode == 0x28) return NSFB_KEY_QUOTEDBL;
     if (keycode == 0x2B) return NSFB_KEY_BACKSLASH;
@@ -577,23 +578,7 @@ static int kolibri_cursor(nsfb_t *nsfb, struct nsfb_cursor_s *cursor) {
 
 
 static int kolibri_update(nsfb_t *nsfb, nsfb_bbox_t *box) {
-    /*SDL_Surface *sdl_screen = nsfb->surface_priv;
-      struct nsfb_cursor_s *cursor = nsfb->cursor;
-
-      if ((cursor != NULL) &&
-      (cursor->plotted == false)) {
-      nsfb_cursor_plot(nsfb, cursor);
-      }
-
-      SDL_UpdateRect(sdl_screen,
-      box->x0,
-      box->y0,
-      box->x1 - box->x0,
-      box->y1 - box->y0);
-    */
-  
-    //Ask for window redraw here!
-
+    /* Do redraw window here! */
     kolibri_redraw(nsfb);
     return 0;
 }
@@ -609,10 +594,3 @@ const nsfb_surface_rtns_t kolibri_rtns = {
 };
 
 NSFB_SURFACE_DEF(kolibri, NSFB_SURFACE_KOLIBRI, &kolibri_rtns)
-
-/*
- * Local variables:
- *  c-basic-offset: 4
- *  tab-width: 8
- * End:
- */
