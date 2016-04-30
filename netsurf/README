@@ -79,6 +79,10 @@ CSS Does not always load pretty graphics for the same website (For example board
 
 ===FIXED=== Crash with imgur.com
 
+Handle netsurf command line handling arguments
+
+Remove hard coded paths about /usbhd0/1/ so that the binary can run from anywhere.
+
 No HTTPS (Half of the world uses it....Damn PolarSSL..)
 
 Handle TAB key to cycle through fields.
