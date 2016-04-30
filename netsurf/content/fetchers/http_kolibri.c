@@ -5,15 +5,33 @@
 
 #include "content/fetch.h"
 
+#include <stdio.h>
+
 /* TODO: Make these symbols static as they don't need to be exported. Only the register function needs to be non static */
 
+bool GLOBAL_DESTROY = false;
+
+FILE *xfile = NULL;
+
+int global_poll_counter = 0;
+
+char *post_multipart_boundary = "-----------------------------55554652820854685881745586916\r\n";
 char *post_type_urlencoded = "application/x-www-form-urlencoded";
-char *post_type_multipart = "multipart/form-data";
+char *post_type_multipart = "multipart/form-data; boundary=-----------------------------55554652820854685881745586916";
 
 bool HEADER_DEBUG = true;
 
 typedef enum {SEND, RECEIEVE} http_direction;
 typedef enum {HTTP_GET, HTTP_POST} http_type;
+
+struct multipart_data_fragment {
+  bool is_file;
+  char *header_line;
+  char *data_or_filename;
+  int length_header;
+  int length;
+  struct multipart_data_fragment *next;
+};
 
 /* FIXME: Reorder this struct members logically  */
 struct kolibri_fetch {
@@ -21,6 +39,8 @@ struct kolibri_fetch {
   struct http_msg *http_handle;
   struct kolibri_fetch *next_kolibri_fetch;
   char *urlenc_data;
+  struct multipart_data_fragment *multipart_data;
+  int multipart_content_length;
   char *headers;
   http_type fetch_type;
   http_direction transfer_direction;
@@ -30,6 +50,7 @@ struct kolibri_fetch {
   char *realm;
   size_t url_length;
   int content_length;
+  unsigned int content_transferred;
   bool redirected;
   bool abort;
   bool finished;
@@ -39,6 +60,7 @@ struct kolibri_fetch {
 };
 
 void process_headers(struct kolibri_fetch *);
+struct fetch_multipart_data* multipart_convert(struct fetch_multipart_data *control, int *content_length);
 
 struct kolibri_fetch *fetcher_head;
 /* http_handle for this dummy pointer is always NULL */
@@ -102,10 +124,13 @@ bool fetch_http_kolibri_can_fetch(const struct nsurl *url) {
   /* This simply means that we want to make sure NSURL has a HOST component */
   /*FIXME  : 1 is NSURL_SCHEME_HTTP. The enum should be accessible from nsurl.h IMO.*/
 
+  /* FIXME : Use lwc_string_equals or something here for accurate results. */
+
  if(nsurl_get_component(url, NSURL_SCHEME) == corestring_lwc_http)
     return true;
   else {
     debug_board_write_str("Error: Only HTTP scheme supported. No HTTPS!");
+    /* __asm__ __volatile__("int3"); */
     return false;
     }
 }
@@ -114,6 +139,11 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
 		bool only_2xx, bool downgrade_tls, const char *post_urlenc,
 		const struct fetch_multipart_data *post_multipart,
 		const char **headers) {
+
+    xfile = fopen("/tmp0/1/poller.txt", "a");
+    fprintf(xfile, "Into setup() fetch\n");
+    fclose(xfile);
+
 
   //debug_board_write_str("HTTP SETUP\n\n");
 
@@ -129,6 +159,11 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
   /*   debug_board_write_str("\n"); */
   /*   temp = temp->next; */
   /* } */
+
+    xfile = fopen("/tmp0/1/setup.txt", "a");
+    fprintf(xfile, "urlenc data on setup: : %s\n", post_urlenc == NULL ? "NULL" : post_urlenc);
+    fprintf(xfile, "multipart data : %s\n\n", post_multipart == NULL? "NULL" : "SOMETHING");
+    fclose(xfile);
 
   /* XXXXXXXXXXXXX */
   struct kolibri_fetch *new_kfetcher = malloc(sizeof(struct kolibri_fetch));
@@ -147,6 +182,10 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
   new_kfetcher -> cookie_string = NULL;
   new_kfetcher -> location = NULL;
   new_kfetcher -> realm = NULL;
+  new_kfetcher -> content_transferred = 0;
+  new_kfetcher -> multipart_data = NULL;
+  new_kfetcher -> multipart_content_length = 0;
+  new_kfetcher -> urlenc_data = NULL;
   
   char *header_creator = new_kfetcher->headers;
   int total_length_headers = 0;
@@ -228,7 +267,17 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
   /* If we have either of these, we need to do a post request */
   /* FIXME: Add multipart data as well */
 
-  if (post_urlenc) {
+  if(post_multipart) {
+    debug_board_write_str("Setting up multipart.\n\n");
+    /* __asm__ __volatile__("int3"); */
+    new_kfetcher -> fetch_type = HTTP_POST;
+    new_kfetcher -> multipart_data = multipart_convert(post_multipart, &(new_kfetcher->multipart_content_length));
+    new_kfetcher -> transfer_direction = SEND;
+    debug_board_write_str("Done with setting multipart.\n\n");
+
+    /* __asm__ __volatile__("int3"); */
+  }
+  else if (post_urlenc) {
     int i;
     new_kfetcher -> fetch_type = HTTP_POST;
     new_kfetcher -> urlenc_data = strdup(post_urlenc);
@@ -261,12 +310,21 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
   /* sprintf(addr, "[Setup hh]Address: %p\n", (void *)(new_kfetcher->http_handle)); */
   /* debug_board_write_str(addr); */
 
+    xfile = fopen("/tmp0/1/poller.txt", "a");
+    fprintf(xfile, "Leaving setup() fetch\n");
+    fclose(xfile);
+
+
   return new_kfetcher;
 }
 
 bool fetch_http_kolibri_start(void *kfetch) {
   /* debug_board_write_str("HTTP_START : "); */
   struct kolibri_fetch *fetch = (struct kolibri_fetch *)kfetch;
+
+    xfile = fopen("/tmp0/1/poller.txt", "a");
+    fprintf(xfile, "Into start() fetch\n");
+    fclose(xfile);
 
   /* FIXME: add true or false return depending upon http_get_asm return value */
 
@@ -275,9 +333,36 @@ bool fetch_http_kolibri_start(void *kfetch) {
 
   if(fetch -> urlenc_data) {
     /* debug_board_write_str("Trying POST\n"); */
+    xfile = fopen("/tmp0/1/mpart.txt", "a");
+    fprintf(xfile, "urlenc data on handle : %s\n", fetch->urlenc_data);
+    fprintf(xfile, "Content length for urlenc : %l", fetch->content_length);
+    fclose(xfile);
+
     fetch->http_handle = http_post_asm(fetch->url_string, NULL, 0, fetch->headers,
 				       post_type_urlencoded,
 				       strlen(fetch->urlenc_data));
+  }
+  else if(fetch -> multipart_data) {
+    xfile = fopen("/tmp0/1/mpart.txt", "a");
+    fprintf(xfile, "Multipart on handle : %p\n", fetch->http_handle);
+    fprintf(xfile, "Content length for MP : %d\n", fetch->multipart_content_length);
+    fclose(xfile);
+
+
+    debug_board_write_str("Sending headers for multipart\n\n");
+    /* __asm__ __volatile__("int3"); */
+    char datax[100];
+    sprintf(datax, "Content->length = %d\n", fetch->multipart_content_length);
+    debug_board_write_str(datax);
+
+
+    
+    fetch->http_handle = http_post_asm(fetch->url_string, NULL, 0, fetch->headers,
+				       post_type_multipart,
+				       fetch->multipart_content_length);
+
+    debug_board_write_str("Done Sending headers for multipart\n\n");
+    /* __asm__ __volatile__("int3"); */
   }
   else {
     /* debug_board_write_str("Trying GET\n"); */
@@ -302,10 +387,21 @@ bool fetch_http_kolibri_start(void *kfetch) {
 
   f->next_kolibri_fetch = kfetch;
 
+    xfile = fopen("/tmp0/1/poller.txt", "a");
+    fprintf(xfile, "Leaving start() fetch\n");
+    fclose(xfile);
+
+
+
   return true;
 }
 
 void fetch_http_kolibri_abort(void *fetch) {
+
+    xfile = fopen("/tmp0/1/poller.txt", "a");
+    fprintf(xfile, "Into abort() fetch\n");
+    fclose(xfile);
+
 
   struct kolibri_fetch* f = (struct kolibri_fetch *)fetch;
 
@@ -321,6 +417,11 @@ void fetch_http_kolibri_abort(void *fetch) {
 
   /* fetch_free(f->fetch_handle); */
   /* fetch_http_kolibri_free(fetch); */
+
+    xfile = fopen("/tmp0/1/poller.txt", "a");
+    fprintf(xfile, "Leaving abort() fetch\n");
+    fclose(xfile);
+
 }
 
 void fetch_http_kolibri_free(void *kfetch) {
@@ -329,6 +430,10 @@ void fetch_http_kolibri_free(void *kfetch) {
 
   struct kolibri_fetch *kfetch_to_free = (struct kolibri_fetch *)kfetch;
   struct kolibri_fetch *delete_ptr = fetcher_head;
+
+    xfile = fopen("/tmp0/1/poller.txt", "a");
+    fprintf(xfile, "Into free() fetch\n");
+    fclose(xfile);
 
   /* debug_board_write_str("Calling http_free_asm\n"); */
 
@@ -370,6 +475,10 @@ void fetch_http_kolibri_free(void *kfetch) {
 
   free(kfetch_to_free);
 
+    xfile = fopen("/tmp0/1/poller.txt", "a");
+    fprintf(xfile, "Leaving free() fetch\n");
+    fclose(xfile);
+
   //  print_linked_list();
   //  ;
   /* debug_board_write_str("Leaving kolibri_fetch_free\n"); */
@@ -387,6 +496,10 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
   /*   debug_board_write_str("Poller: NEXT IS NULL!\n"); */
   /* else */
   /*   debug_board_write_str("Poller: NEXT IS NOT NULL!\n"); */
+  global_poll_counter++;
+    xfile = fopen("/tmp0/1/poller.txt", "a");
+    fprintf(xfile, "Entering Poll for entry: %d\n", global_poll_counter);
+    fclose(xfile);
 
   //  ;
   while(poller!=NULL)
@@ -399,17 +512,38 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
       if(poller->transfer_complete == false) {
 
 	if(poller->transfer_direction == RECEIEVE) {
-	  /* char datax[500]; */
-	  /* sprintf(datax, "Receiving for: %s with http at %p\n", poller->url_string, poller->http_handle); */
-	  /* debug_board_write_str(datax); */
+	  char datax[500];
+	  sprintf(datax, "Receiving for: %s with http at %p\n", poller->url_string, poller->http_handle);
+	  debug_board_write_str(datax);
 
+    xfile = fopen("/tmp0/1/poller.txt", "a");
+    fprintf(xfile, "START fetch->http handle : %p\n", poller->http_handle == NULL ? 0 : poller->http_handle);
+    fclose(xfile);
+	  
+	  /* if(GLOBAL_DESTROY == true) { debug_board_write_str("XX1\n"); __asm__ __volatile__("int3"); } */
 	  int x = http_receive_asm(poller->http_handle);
 
 	  if(!poller->headers_processed && (poller->http_handle->flags & HTTP_GOT_HEADER))
-	    	    process_headers(poller);
+	    {
+	      debug_board_write_str("Process Headers for : \n");
+	      debug_board_write_str(poller->url_string);
+	      debug_board_write_str("\n");
+	      /* if(GLOBAL_DESTROY == true) { debug_board_write_str("XX2\n"); __asm__ __volatile__("int3"); } */
+	      process_headers(poller);
+	    }
+
+    xfile = fopen("/tmp0/1/poller.txt", "a");
+    fprintf(xfile, "FINISHED fetch->http handle : %p\n", poller->http_handle == NULL ? 0 : poller->http_handle);
+    fclose(xfile);
+
 
 	  if(x == 0)
 	    {
+	      /* if(HEADER_DEBUG == true) { */
+	      /* 	char datax[100]; */
+	      /* 	sprintf(datax, "Flags are : %u\n", poller->http_handle->flags); */
+	      /* 	debug_board_write_str(datax); */
+	      /* } */
 	      poller->transfer_complete = true;
 	      /* sprintf(datax, "Finished for: %s with http at %p\n", poller->url_string, poller->http_handle); */
 	      /* debug_board_write_str(datax); */
@@ -421,29 +555,150 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	}
 	else /* if transfer_direction == SEND */
 	  {
-	    int remaining_length = poller->content_length;
-	    int sent_length = http_send_asm(poller->http_handle, poller->urlenc_data, remaining_length);
+	    if(poller->multipart_data) {
 
-	    if(sent_length == -1) {
-	      debug_board_write_str("Error occured with http_send!\n");
-	      __asm__ __volatile__("int3");
+	      debug_board_write_str("Sending data : HEADER for multipart");
+	      /* __asm__ __volatile__("int3"); */
+
+	      struct multipart_data_fragment *fragment = poller->multipart_data;
+
+	      int remaining_length = fragment->length_header;
+	      int sent = 0;
+	      int total_sent = 0;
+
+    FILE *httplog = fopen("/tmp0/1/httplog.txt", "a");
+    fprintf(httplog, "Header XXX=> ");
+    fprintf(httplog, fragment->header_line);
+    fprintf(httplog, "\n");
+    fclose(httplog);
+	      
+	      while(remaining_length > 0) {
+		sent = http_send_asm(poller->http_handle, fragment->header_line + total_sent, remaining_length);
+
+		if(sent == -1) {
+		  debug_board_write_str("Error occured with http_send!\n");
+		  /* __asm__ __volatile__("int3"); */
+		  continue; /* FIXME:  */
+		}
+		remaining_length -= sent;
+		total_sent += sent;
+	      }
+
+    httplog = fopen("/tmp0/1/httplog.txt", "a");
+    fprintf(httplog, "data XXX=> ");
+    fprintf(httplog, fragment->data_or_filename);
+    fprintf(httplog, "\n");
+    fclose(httplog);
+
+	      debug_board_write_str("Sending data : DATA for multipart\n\n");
+	      /* __asm__ __volatile__("int3"); */
+	      
+	      remaining_length = fragment->length - fragment->length_header;
+	      total_sent = 0;
+
+	      char *data_with_crlf = malloc(remaining_length + 1);
+	      /* __asm__ __volatile__("int3"); */
+	      
+	      sprintf(data_with_crlf, "%s\r\n", fragment->data_or_filename == NULL ? "" : fragment->data_or_filename);
+	      
+	      while(remaining_length > 0) {
+		sent = http_send_asm(poller->http_handle, data_with_crlf + total_sent, remaining_length);
+
+		if(sent == -1) {
+		  debug_board_write_str("Error occured with http_send!\n");
+		  /* __asm__ __volatile__("int3");  */
+		  continue;/* FIXME */
+		}
+		remaining_length -= sent;
+		total_sent +=sent;
+	      }
+
+	      free(data_with_crlf);
+	      poller->multipart_data = poller->multipart_data -> next;
+
+	      debug_board_write_str("Freeing fragment for multipart\n\n");
+	      /* __asm__ __volatile__("int3"); */
+	      free(fragment);
+
+	      if(poller->multipart_data == NULL)
+		{
+
+    httplog = fopen("/tmp0/1/httplog.txt", "a");
+    fprintf(httplog, "--\\r\\n");
+    fprintf(httplog, "\n");
+    fclose(httplog);
+
+
+		  total_sent = 0;
+		  remaining_length = strlen(post_multipart_boundary) - 2;
+		  char *end_of_multipart = malloc(remaining_length + 4 + 1);
+		  int i;
+		  for(i = 0; i < remaining_length; i++)
+		    end_of_multipart[i] = post_multipart_boundary[i];
+
+		  end_of_multipart[i++] = '-';
+		  end_of_multipart[i++] = '-';
+		  end_of_multipart[i++] = '\r';
+		  end_of_multipart[i++] = '\n';
+		  end_of_multipart[i++] = '\0';
+		
+		  remaining_length += 4;
+		  
+		  /* sprintf(end_of_multipart, "%s--\r\n", post_multipart_boundary); */
+		  
+		  while(remaining_length > 0) {
+		    sent = http_send_asm(poller->http_handle, end_of_multipart + total_sent, remaining_length);
+
+		    if(sent == -1) {
+		      debug_board_write_str("Error occured with http_send with multipart!\n");
+		      __asm__ __volatile__("int3");
+		      continue;/* FIXME */
+		    }
+		    remaining_length -= sent;
+		    total_sent += sent;
+		  }
+
+		  /*Invert the direction after we have sent all multipart data */
+		  poller->transfer_direction = RECEIEVE;
+		}
+
+	      debug_board_write_str("Everything done for multipart!");
+	      /* __asm__ __volatile__("int3"); */
+
+	      poller = poller->next_kolibri_fetch;
+GLOBAL_DESTROY = true;	      
+/* if(GLOBAL_DESTROY == true) { debug_board_write_str("XX3\n"); __asm__ __volatile__("int3"); } */
 	      continue;
 	    }
-	    remaining_length -= sent_length;
-	    poller->content_length = remaining_length;
-
-	    if(remaining_length == 0)
-	      {
-	      /* debug_board_write_str("POST HTTP FETCH_FINISHED\n"); */
-	      poller->transfer_direction = RECEIEVE;
-	      }
 	    else {
+	      int remaining_length = poller->content_length;
+	      int total_sent = 0;
+	      int sent = 0;
+
+	      while(remaining_length > 0)
+		{
+		  sent = http_send_asm(poller->http_handle, poller->urlenc_data + total_sent, remaining_length);
+
+		  if(sent == -1) {
+		    debug_board_write_str("Error occured with http_send for urlenc!\n");
+		    __asm__ __volatile__("int3");
+		    break;
+		  }
+
+		  remaining_length -= sent;
+		  total_sent += sent;
+		}
+
+	      if(remaining_length > 0) continue;
+	      
+	      poller->transfer_direction = RECEIEVE;
+	      poller->content_length = 0;
 	      poller = poller->next_kolibri_fetch;
 	      continue;
 	    }
 	  }
       }
-
+    
       if((poller -> finished == false && poller->transfer_complete == true)) {
 	if(poller->transfer_direction == RECEIEVE)
 	  {
@@ -454,14 +709,12 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	    if(http_code == 200) {
 	      /* debug_board_write_str("200 OK! HTTP Code.\n"); */
 	      /* __asm__ __volatile__("int3"); */
-
 	      /* debug_board_write_str("Do FETCH_DATA\n"); */
 
 	      msg.type = FETCH_DATA;
 	      msg.data.header_or_data.buf = (const uint8_t *) poller -> http_handle -> content_ptr;
 	      msg.data.header_or_data.len = (size_t) poller -> http_handle -> content_length;
 	      fetch_send_callback(&msg, poller->fetch_handle);
-
 	      poller->data_processed = true;
 	    }
 	    else if (300 <= http_code && http_code < 400) {
@@ -475,13 +728,14 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
     debug_board_write_str("New location: ");
     debug_board_write_str(poller->location);
     debug_board_write_str("\n");
+    /* __asm__ __volatile__("int3"); */
   }
 		  msg.data.redirect = poller->location;
 		  fetch_send_callback(&msg, poller->fetch_handle);
 		}
 		else {
 		  debug_board_write_str("Got 3xx redirect but no target URL.");
-		  __asm__ __volatile__("int3");
+		  /* __asm__ __volatile__("int3"); */
 		}
 	      }
 	      else {
@@ -497,6 +751,12 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	      else if(http_code == 404) {
 		msg.type = FETCH_ERROR;
 		msg.data.error = messages_get("HTTP Code 404: Not found");
+		fetch_send_callback(&msg, poller->fetch_handle);
+		fetch_abort(poller->fetch_handle);
+	      }
+	      else {
+		msg.type = FETCH_ERROR;
+		msg.data.error = messages_get("HTTP Code 4xx: Client Error.");
 		fetch_send_callback(&msg, poller->fetch_handle);
 		fetch_abort(poller->fetch_handle);
 	      }
@@ -526,8 +786,7 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 
 	      /* FIXME: Properly free the fetcher and http handle */
 	      fetch_remove_from_queues(poller->fetch_handle);
-	      fetch_free(poller->fetch_handle);
-
+	      fetch_abort(poller->fetch_handle);
 	    }
 	  } /* End of if direction == RECEIEVE */
       }
@@ -536,6 +795,10 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
       }
       poller = poller -> next_kolibri_fetch;
     }
+
+    xfile = fopen("/tmp0/1/poller.txt", "a");
+    fprintf(xfile, "Returning from poller for enrty : %d\n", global_poll_counter);
+    fclose(xfile);
 }
 
 void fetch_http_kolibri_finalise(lwc_string *scheme) {
@@ -777,4 +1040,73 @@ void process_headers(struct kolibri_fetch *poller) {
 
   /* debug_board_write_str("Headers processed\n"); */
   /* __asm__ __volatile__("int3"); */
+}
+
+struct fetch_multipart_data* multipart_convert(struct fetch_multipart_data *control, int *content_length)
+{
+ /* FIXME: Fix this function to do a stat on filenames and get their size. After that, the filesize should be added */
+ /*        to content_length pointer (the second parameter to function  */
+
+  FILE *httplog =  NULL;
+
+  struct multipart_data_fragment *free_me = malloc(sizeof(struct multipart_data_fragment));
+  struct multipart_data_fragment *creator = NULL;
+  struct multipart_data_fragment *to_be_freed = free_me;
+  struct multipart_data_fragment *to_be_returned = NULL;
+
+  for (; control; control = control->next) {
+    creator = malloc(sizeof(struct multipart_data_fragment));
+          httplog = fopen("/tmp0/1/httplog.txt", "a");
+
+
+    if(control->file) {
+
+      /* Content-Disposition: form-data; name="img"; filename="a.png" */
+      /* malloc, ending 1 + 4 + 1 : EndQuote + CRLF + CRLF + NULLBYTE */
+      creator->header_line = (char *)malloc(strlen(post_multipart_boundary) + 38 + strlen(control->name) + 13 + strlen(control->rawfile) + 1 + 4 + 1);
+
+      sprintf(creator->header_line, "--%sContent-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\nContent-Type: application/octet-stream\r\n\r\n", post_multipart_boundary, control->name, control->rawfile);
+      
+      creator->data_or_filename = strdup(control->rawfile);
+
+      /*FIXME: Fix this stat call and file size getting */
+      /* creator->length += (stat(filename) -> file_size)  + 2 (for CRLF)*/
+      /* +2 for CRLF */
+      creator->length_header = strlen(creator->header_line);
+      creator->length = creator->length_header + 2 ;
+      *content_length += creator->length;
+    }    
+    else {
+      /* Content-Disposition: form-data; name="foo" */
+      creator->header_line = (char *)malloc(strlen(post_multipart_boundary) + 38 + strlen(control->name) + 1 + 4 + 1);
+
+      sprintf(creator->header_line, "--%sContent-Disposition: form-data; name=\"%s\"\r\n\r\n", post_multipart_boundary, 
+	      control->name);
+
+      creator->data_or_filename = strdup(control->value);
+      creator->length_header = strlen(creator->header_line);
+      creator->length = creator->length_header + strlen(creator->data_or_filename) + 2;
+      *content_length += creator->length;
+    }
+    creator -> next = NULL;
+
+    fprintf(httplog, "line: %s", creator->header_line);
+    fprintf(httplog, "value: %s", creator->data_or_filename);
+    fprintf(httplog, "\nLength: %d", creator->length_header);
+    fprintf(httplog, "\nTotal length: %d\n", creator->length);
+    fclose(httplog);
+
+    free_me->next = creator;
+    free_me = free_me->next;
+  }
+  
+  to_be_returned = to_be_freed -> next;
+  free(to_be_freed);
+
+  /* __asm__ __volatile__("int3"); */
+  /*Compensate for ending boundary and --/r/n to be sent over the network */
+  /* -2 because we don't want a CRLF after end of boundary at end of multipart */
+  *content_length += strlen(post_multipart_boundary) + 4 - 2;
+
+  return to_be_returned;
 }
