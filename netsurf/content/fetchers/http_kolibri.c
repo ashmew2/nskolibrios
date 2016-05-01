@@ -492,16 +492,7 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
   //  debug_board_write_str("Inside fetch_http_kolibri_poll\n");
   /* Assume all schemes are HTTP for now */
   struct kolibri_fetch *poller = fetcher_head -> next_kolibri_fetch;
-  /* if(fetcher_head -> next_kolibri_fetch == NULL) */
-  /*   debug_board_write_str("Poller: NEXT IS NULL!\n"); */
-  /* else */
-  /*   debug_board_write_str("Poller: NEXT IS NOT NULL!\n"); */
-  global_poll_counter++;
-    xfile = fopen("/tmp0/1/poller.txt", "a");
-    fprintf(xfile, "Entering Poll for entry: %d\n", global_poll_counter);
-    fclose(xfile);
 
-  //  ;
   while(poller!=NULL)
     {
       if(poller->abort == true) {
@@ -516,10 +507,6 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	  sprintf(datax, "Receiving for: %s with http at %p\n", poller->url_string, poller->http_handle);
 	  debug_board_write_str(datax);
 
-    xfile = fopen("/tmp0/1/poller.txt", "a");
-    fprintf(xfile, "START fetch->http handle : %p\n", poller->http_handle == NULL ? 0 : poller->http_handle);
-    fclose(xfile);
-	  
 	  /* if(GLOBAL_DESTROY == true) { debug_board_write_str("XX1\n"); __asm__ __volatile__("int3"); } */
 	  int x = http_receive_asm(poller->http_handle);
 
@@ -535,7 +522,6 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
     xfile = fopen("/tmp0/1/poller.txt", "a");
     fprintf(xfile, "FINISHED fetch->http handle : %p\n", poller->http_handle == NULL ? 0 : poller->http_handle);
     fclose(xfile);
-
 
 	  if(x == 0)
 	    {
@@ -557,82 +543,57 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	  {
 	    if(poller->multipart_data) {
 
-	      debug_board_write_str("Sending data : HEADER for multipart");
-	      /* __asm__ __volatile__("int3"); */
-
 	      struct multipart_data_fragment *fragment = poller->multipart_data;
+	      http_send(poller->http_handle, fragment->header_line, fragment->length_header);
+	      /* int remaining_length = fragment->length_header; */
+	      /* int sent = 0; */
+	      /* int total_sent = 0; */
 
-	      int remaining_length = fragment->length_header;
-	      int sent = 0;
-	      int total_sent = 0;
+	      /* while(remaining_length > 0) { */
+	      /* 	sent = http_send_asm(poller->http_handle, fragment->header_line + total_sent, remaining_length); */
 
-    FILE *httplog = fopen("/tmp0/1/httplog.txt", "a");
-    fprintf(httplog, "Header XXX=> ");
-    fprintf(httplog, fragment->header_line);
-    fprintf(httplog, "\n");
-    fclose(httplog);
-	      
-	      while(remaining_length > 0) {
-		sent = http_send_asm(poller->http_handle, fragment->header_line + total_sent, remaining_length);
-
-		if(sent == -1) {
-		  debug_board_write_str("Error occured with http_send!\n");
-		  /* __asm__ __volatile__("int3"); */
-		  continue; /* FIXME:  */
-		}
-		remaining_length -= sent;
-		total_sent += sent;
-	      }
-
-    httplog = fopen("/tmp0/1/httplog.txt", "a");
-    fprintf(httplog, "data XXX=> ");
-    fprintf(httplog, fragment->data_or_filename);
-    fprintf(httplog, "\n");
-    fclose(httplog);
-
-	      debug_board_write_str("Sending data : DATA for multipart\n\n");
-	      /* __asm__ __volatile__("int3"); */
-	      
-	      remaining_length = fragment->length - fragment->length_header;
-	      total_sent = 0;
+	      /* 	if(sent == -1) { */
+	      /* 	  debug_board_write_str("Error occured with http_send!\n"); */
+	      /* 	  /\* __asm__ __volatile__("int3"); *\/ */
+	      /* 	  continue; /\* FIXME:  *\/ */
+	      /* 	} */
+	      /* 	remaining_length -= sent; */
+	      /* 	total_sent += sent; */
+	      /* } */
 
 	      char *data_with_crlf = malloc(remaining_length + 1);
-	      /* __asm__ __volatile__("int3"); */
-	      
 	      sprintf(data_with_crlf, "%s\r\n", fragment->data_or_filename == NULL ? "" : fragment->data_or_filename);
-	      
-	      while(remaining_length > 0) {
-		sent = http_send_asm(poller->http_handle, data_with_crlf + total_sent, remaining_length);
-
-		if(sent == -1) {
-		  debug_board_write_str("Error occured with http_send!\n");
-		  /* __asm__ __volatile__("int3");  */
-		  continue;/* FIXME */
-		}
-		remaining_length -= sent;
-		total_sent +=sent;
-	      }
-
+	      http_send(poller->http_handle, data_with_crlf, fragment->length - fragment->length_header);
 	      free(data_with_crlf);
-	      poller->multipart_data = poller->multipart_data -> next;
 
-	      debug_board_write_str("Freeing fragment for multipart\n\n");
-	      /* __asm__ __volatile__("int3"); */
+	      /* remaining_length = fragment->length - fragment->length_header; */
+	      /* total_sent = 0; */
+
+	      /* char *data_with_crlf = malloc(remaining_length + 1); */
+	      /* sprintf(data_with_crlf, "%s\r\n", fragment->data_or_filename == NULL ? "" : fragment->data_or_filename); */
+	      
+	      /* while(remaining_length > 0) { */
+	      /* 	sent = http_send_asm(poller->http_handle, data_with_crlf + total_sent, remaining_length); */
+
+	      /* 	if(sent == -1) { */
+	      /* 	  debug_board_write_str("Error occured with http_send!\n"); */
+	      /* 	  /\* __asm__ __volatile__("int3");  *\/ */
+	      /* 	  continue;/\* FIXME *\/ */
+	      /* 	} */
+	      /* 	remaining_length -= sent; */
+	      /* 	total_sent +=sent; */
+	      /* } */
+	      /* free(data_with_crlf); */
+
+	      poller->multipart_data = poller->multipart_data -> next;
 	      free(fragment);
 
 	      if(poller->multipart_data == NULL)
 		{
-
-    httplog = fopen("/tmp0/1/httplog.txt", "a");
-    fprintf(httplog, "--\\r\\n");
-    fprintf(httplog, "\n");
-    fclose(httplog);
-
-
-		  total_sent = 0;
-		  remaining_length = strlen(post_multipart_boundary) - 2;
+		  int remaining_length = strlen(post_multipart_boundary) - 2;
 		  char *end_of_multipart = malloc(remaining_length + 4 + 1);
 		  int i;
+
 		  for(i = 0; i < remaining_length; i++)
 		    end_of_multipart[i] = post_multipart_boundary[i];
 
@@ -641,22 +602,38 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 		  end_of_multipart[i++] = '\r';
 		  end_of_multipart[i++] = '\n';
 		  end_of_multipart[i++] = '\0';
-		
+
 		  remaining_length += 4;
 		  
-		  /* sprintf(end_of_multipart, "%s--\r\n", post_multipart_boundary); */
-		  
-		  while(remaining_length > 0) {
-		    sent = http_send_asm(poller->http_handle, end_of_multipart + total_sent, remaining_length);
+		  http_send(poller->http_handle, end_of_multipart, remaining_length);
 
-		    if(sent == -1) {
-		      debug_board_write_str("Error occured with http_send with multipart!\n");
-		      __asm__ __volatile__("int3");
-		      continue;/* FIXME */
-		    }
-		    remaining_length -= sent;
-		    total_sent += sent;
-		  }
+		  /* remaining_length = strlen(post_multipart_boundary) - 2; */
+		  /* char *end_of_multipart = malloc(remaining_length + 4 + 1); */
+		  /* int i; */
+		  /* for(i = 0; i < remaining_length; i++) */
+		  /*   end_of_multipart[i] = post_multipart_boundary[i]; */
+
+		  /* end_of_multipart[i++] = '-'; */
+		  /* end_of_multipart[i++] = '-'; */
+		  /* end_of_multipart[i++] = '\r'; */
+		  /* end_of_multipart[i++] = '\n'; */
+		  /* end_of_multipart[i++] = '\0'; */
+		
+		  /* remaining_length += 4; */
+		  
+		  /* /\* sprintf(end_of_multipart, "%s--\r\n", post_multipart_boundary); *\/ */
+		  
+		  /* while(remaining_length > 0) { */
+		  /*   sent = http_send_asm(poller->http_handle, end_of_multipart + total_sent, remaining_length); */
+
+		  /*   if(sent == -1) { */
+		  /*     debug_board_write_str("Error occured with http_send with multipart!\n"); */
+		  /*     __asm__ __volatile__("int3"); */
+		  /*     continue;/\* FIXME *\/ */
+		  /*   } */
+		  /*   remaining_length -= sent; */
+		  /*   total_sent += sent; */
+		  /* } */
 
 		  /*Invert the direction after we have sent all multipart data */
 		  poller->transfer_direction = RECEIEVE;
@@ -671,30 +648,32 @@ GLOBAL_DESTROY = true;
 	      continue;
 	    }
 	    else {
-	      int remaining_length = poller->content_length;
-	      int total_sent = 0;
-	      int sent = 0;
 
-	      while(remaining_length > 0)
-		{
-		  sent = http_send_asm(poller->http_handle, poller->urlenc_data + total_sent, remaining_length);
+	      http_send(poller->http_handle, poller->urlenc_data, poller->content_length);
 
-		  if(sent == -1) {
-		    debug_board_write_str("Error occured with http_send for urlenc!\n");
-		    __asm__ __volatile__("int3");
-		    break;
-		  }
+	      /* int remaining_length = poller->content_length; */
+	      /* int total_sent = 0; */
+	      /* int sent = 0; */
 
-		  remaining_length -= sent;
-		  total_sent += sent;
-		}
+	      /* while(remaining_length > 0) */
+	      /* 	{ */
+	      /* 	  sent = http_send_asm(poller->http_handle, poller->urlenc_data + total_sent, remaining_length); */
 
-	      if(remaining_length > 0) continue;
+	      /* 	  if(sent == -1) { */
+	      /* 	    debug_board_write_str("Error occured with http_send for urlenc!\n"); */
+	      /* 	    __asm__ __volatile__("int3"); */
+	      /* 	    break; */
+	      /* 	  } */
+
+	      /* 	  remaining_length -= sent; */
+	      /* 	  total_sent += sent; */
+	      /* 	} */
+
+	      /* if(remaining_length > 0) continue; */
 	      
 	      poller->transfer_direction = RECEIEVE;
 	      poller->content_length = 0;
 	      poller = poller->next_kolibri_fetch;
-	      continue;
 	    }
 	  }
       }
