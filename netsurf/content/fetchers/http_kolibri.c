@@ -9,10 +9,6 @@
 
 /* TODO: Make these symbols static as they don't need to be exported. Only the register function needs to be non static */
 
-bool GLOBAL_DESTROY = false;
-
-FILE *xfile = NULL;
-
 int global_poll_counter = 0;
 
 char *post_multipart_boundary = "-----------------------------55554652820854685881745586916\r\n";
@@ -140,32 +136,6 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
 		const struct fetch_multipart_data *post_multipart,
 		const char **headers) {
 
-    xfile = fopen("/tmp0/1/poller.txt", "a");
-    fprintf(xfile, "Into setup() fetch\n");
-    fclose(xfile);
-
-
-  //debug_board_write_str("HTTP SETUP\n\n");
-
-/* XXXXXXXXXXXXX */
-  /* if(post_urlenc!=NULL) { */
-  /*   debug_board_write_str("\n"); */
-  /*   debug_board_write_str(post_urlenc); */
-  /* } */
-
-  /* struct fetch_multipart_data *temp = post_multipart; */
-  /* while(temp != NULL) { */
-  /*   debug_board_write_str(temp->name); */
-  /*   debug_board_write_str("\n"); */
-  /*   temp = temp->next; */
-  /* } */
-
-    xfile = fopen("/tmp0/1/setup.txt", "a");
-    fprintf(xfile, "urlenc data on setup: : %s\n", post_urlenc == NULL ? "NULL" : post_urlenc);
-    fprintf(xfile, "multipart data : %s\n\n", post_multipart == NULL? "NULL" : "SOMETHING");
-    fclose(xfile);
-
-  /* XXXXXXXXXXXXX */
   struct kolibri_fetch *new_kfetcher = malloc(sizeof(struct kolibri_fetch));
   char addr[100];
 
@@ -310,21 +280,12 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
   /* sprintf(addr, "[Setup hh]Address: %p\n", (void *)(new_kfetcher->http_handle)); */
   /* debug_board_write_str(addr); */
 
-    xfile = fopen("/tmp0/1/poller.txt", "a");
-    fprintf(xfile, "Leaving setup() fetch\n");
-    fclose(xfile);
-
-
   return new_kfetcher;
 }
 
 bool fetch_http_kolibri_start(void *kfetch) {
   /* debug_board_write_str("HTTP_START : "); */
   struct kolibri_fetch *fetch = (struct kolibri_fetch *)kfetch;
-
-    xfile = fopen("/tmp0/1/poller.txt", "a");
-    fprintf(xfile, "Into start() fetch\n");
-    fclose(xfile);
 
   /* FIXME: add true or false return depending upon http_get_asm return value */
 
@@ -333,21 +294,12 @@ bool fetch_http_kolibri_start(void *kfetch) {
 
   if(fetch -> urlenc_data) {
     /* debug_board_write_str("Trying POST\n"); */
-    xfile = fopen("/tmp0/1/mpart.txt", "a");
-    fprintf(xfile, "urlenc data on handle : %s\n", fetch->urlenc_data);
-    fprintf(xfile, "Content length for urlenc : %l", fetch->content_length);
-    fclose(xfile);
 
     fetch->http_handle = http_post_asm(fetch->url_string, NULL, 0, fetch->headers,
 				       post_type_urlencoded,
 				       strlen(fetch->urlenc_data));
   }
   else if(fetch -> multipart_data) {
-    xfile = fopen("/tmp0/1/mpart.txt", "a");
-    fprintf(xfile, "Multipart on handle : %p\n", fetch->http_handle);
-    fprintf(xfile, "Content length for MP : %d\n", fetch->multipart_content_length);
-    fclose(xfile);
-
 
     debug_board_write_str("Sending headers for multipart\n\n");
     /* __asm__ __volatile__("int3"); */
@@ -387,21 +339,10 @@ bool fetch_http_kolibri_start(void *kfetch) {
 
   f->next_kolibri_fetch = kfetch;
 
-    xfile = fopen("/tmp0/1/poller.txt", "a");
-    fprintf(xfile, "Leaving start() fetch\n");
-    fclose(xfile);
-
-
-
   return true;
 }
 
 void fetch_http_kolibri_abort(void *fetch) {
-
-    xfile = fopen("/tmp0/1/poller.txt", "a");
-    fprintf(xfile, "Into abort() fetch\n");
-    fclose(xfile);
-
 
   struct kolibri_fetch* f = (struct kolibri_fetch *)fetch;
 
@@ -418,10 +359,6 @@ void fetch_http_kolibri_abort(void *fetch) {
   /* fetch_free(f->fetch_handle); */
   /* fetch_http_kolibri_free(fetch); */
 
-    xfile = fopen("/tmp0/1/poller.txt", "a");
-    fprintf(xfile, "Leaving abort() fetch\n");
-    fclose(xfile);
-
 }
 
 void fetch_http_kolibri_free(void *kfetch) {
@@ -430,12 +367,6 @@ void fetch_http_kolibri_free(void *kfetch) {
 
   struct kolibri_fetch *kfetch_to_free = (struct kolibri_fetch *)kfetch;
   struct kolibri_fetch *delete_ptr = fetcher_head;
-
-    xfile = fopen("/tmp0/1/poller.txt", "a");
-    fprintf(xfile, "Into free() fetch\n");
-    fclose(xfile);
-
-  /* debug_board_write_str("Calling http_free_asm\n"); */
 
   if(kfetch_to_free && kfetch_to_free->http_handle)
     http_free_asm(kfetch_to_free -> http_handle);
@@ -450,39 +381,16 @@ void fetch_http_kolibri_free(void *kfetch) {
   while(delete_ptr!=NULL) {
     if(delete_ptr->next_kolibri_fetch == kfetch_to_free)
       {
-	/* char addr[30]; */
-	/* sprintf(addr, "[free]kfetcher: %p\n", (void *)fetcher_head); */
-	/* debug_board_write_str(addr); */
-
 	delete_ptr->next_kolibri_fetch = kfetch_to_free->next_kolibri_fetch;
-	/* debug_board_write_str("kfetch removed from Linked List\n"); */
-
-	/* if(delete_ptr->next_kolibri_fetch == NULL) { */
-	/*   /\* debug_board_write_str("next is now NULL!"); *\/ */
-	/*   /\* if(fetcher_head->next_kolibri_fetch == NULL) *\/ */
-	/*   /\*   debug_board_write_str("FETCHER HEAD NEXT IS NULL!\n"); *\/ */
-	/*   /\* else *\/ */
-	/*   /\*   debug_board_write_str("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOT NULL FETCHER HEAD\n"); *\/ */
-	/* } */
-
-	/* else */
-	/*   debug_board_write_str("next is not NULL!"); */
-
 	break;
       }
+
     delete_ptr=delete_ptr->next_kolibri_fetch;
   }
 
   free(kfetch_to_free);
 
-    xfile = fopen("/tmp0/1/poller.txt", "a");
-    fprintf(xfile, "Leaving free() fetch\n");
-    fclose(xfile);
-
-  //  print_linked_list();
-  //  ;
-  /* debug_board_write_str("Leaving kolibri_fetch_free\n"); */
-  //  ;
+    /* print_linked_list(); */
 }
 
 void fetch_http_kolibri_poll(lwc_string *scheme) {
@@ -507,7 +415,6 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	  sprintf(datax, "Receiving for: %s with http at %p\n", poller->url_string, poller->http_handle);
 	  debug_board_write_str(datax);
 
-	  /* if(GLOBAL_DESTROY == true) { debug_board_write_str("XX1\n"); __asm__ __volatile__("int3"); } */
 	  int x = http_receive_asm(poller->http_handle);
 
 	  if(!poller->headers_processed && (poller->http_handle->flags & HTTP_GOT_HEADER))
@@ -515,25 +422,11 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	      debug_board_write_str("Process Headers for : \n");
 	      debug_board_write_str(poller->url_string);
 	      debug_board_write_str("\n");
-	      /* if(GLOBAL_DESTROY == true) { debug_board_write_str("XX2\n"); __asm__ __volatile__("int3"); } */
 	      process_headers(poller);
 	    }
 
-    xfile = fopen("/tmp0/1/poller.txt", "a");
-    fprintf(xfile, "FINISHED fetch->http handle : %p\n", poller->http_handle == NULL ? 0 : poller->http_handle);
-    fclose(xfile);
-
 	  if(x == 0)
-	    {
-	      /* if(HEADER_DEBUG == true) { */
-	      /* 	char datax[100]; */
-	      /* 	sprintf(datax, "Flags are : %u\n", poller->http_handle->flags); */
-	      /* 	debug_board_write_str(datax); */
-	      /* } */
 	      poller->transfer_complete = true;
-	      /* sprintf(datax, "Finished for: %s with http at %p\n", poller->url_string, poller->http_handle); */
-	      /* debug_board_write_str(datax); */
-	    }
 	  else {
 	    poller = poller->next_kolibri_fetch;
 	    continue;
@@ -581,8 +474,6 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	      /* __asm__ __volatile__("int3"); */
 
 	      poller = poller->next_kolibri_fetch;
-GLOBAL_DESTROY = true;	      
-/* if(GLOBAL_DESTROY == true) { debug_board_write_str("XX3\n"); __asm__ __volatile__("int3"); } */
 	      continue;
 	    }
 	    else {
@@ -603,9 +494,6 @@ GLOBAL_DESTROY = true;
 	    fetch_set_http_code(poller->fetch_handle, http_code);
 
 	    if(http_code == 200) {
-	      /* debug_board_write_str("200 OK! HTTP Code.\n"); */
-	      /* __asm__ __volatile__("int3"); */
-	      /* debug_board_write_str("Do FETCH_DATA\n"); */
 
 	      msg.type = FETCH_DATA;
 	      msg.data.header_or_data.buf = (const uint8_t *) poller -> http_handle -> content_ptr;
@@ -614,24 +502,15 @@ GLOBAL_DESTROY = true;
 	      poller->data_processed = true;
 	    }
 	    else if (300 <= http_code && http_code < 400) {
-	      /* debug_board_write_str("Got redirect..."); */
-	      /* __asm__ __volatile__("int3"); */
 	      if(http_code == 301 || http_code == 302) {
 		if(poller->location) {
 		  msg.type = FETCH_REDIRECT;
 
-  if (HEADER_DEBUG == true) {
-    debug_board_write_str("New location: ");
-    debug_board_write_str(poller->location);
-    debug_board_write_str("\n");
-    /* __asm__ __volatile__("int3"); */
-  }
 		  msg.data.redirect = poller->location;
 		  fetch_send_callback(&msg, poller->fetch_handle);
 		}
 		else {
 		  debug_board_write_str("Got 3xx redirect but no target URL.");
-		  /* __asm__ __volatile__("int3"); */
 		}
 	      }
 	      else {
@@ -691,10 +570,6 @@ GLOBAL_DESTROY = true;
       }
       poller = poller -> next_kolibri_fetch;
     }
-
-    xfile = fopen("/tmp0/1/poller.txt", "a");
-    fprintf(xfile, "Returning from poller for enrty : %d\n", global_poll_counter);
-    fclose(xfile);
 }
 
 void fetch_http_kolibri_finalise(lwc_string *scheme) {
