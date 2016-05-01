@@ -545,45 +545,11 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 
 	      struct multipart_data_fragment *fragment = poller->multipart_data;
 	      http_send(poller->http_handle, fragment->header_line, fragment->length_header);
-	      /* int remaining_length = fragment->length_header; */
-	      /* int sent = 0; */
-	      /* int total_sent = 0; */
-
-	      /* while(remaining_length > 0) { */
-	      /* 	sent = http_send_asm(poller->http_handle, fragment->header_line + total_sent, remaining_length); */
-
-	      /* 	if(sent == -1) { */
-	      /* 	  debug_board_write_str("Error occured with http_send!\n"); */
-	      /* 	  /\* __asm__ __volatile__("int3"); *\/ */
-	      /* 	  continue; /\* FIXME:  *\/ */
-	      /* 	} */
-	      /* 	remaining_length -= sent; */
-	      /* 	total_sent += sent; */
-	      /* } */
 
 	      char *data_with_crlf = malloc(remaining_length + 1);
 	      sprintf(data_with_crlf, "%s\r\n", fragment->data_or_filename == NULL ? "" : fragment->data_or_filename);
 	      http_send(poller->http_handle, data_with_crlf, fragment->length - fragment->length_header);
 	      free(data_with_crlf);
-
-	      /* remaining_length = fragment->length - fragment->length_header; */
-	      /* total_sent = 0; */
-
-	      /* char *data_with_crlf = malloc(remaining_length + 1); */
-	      /* sprintf(data_with_crlf, "%s\r\n", fragment->data_or_filename == NULL ? "" : fragment->data_or_filename); */
-	      
-	      /* while(remaining_length > 0) { */
-	      /* 	sent = http_send_asm(poller->http_handle, data_with_crlf + total_sent, remaining_length); */
-
-	      /* 	if(sent == -1) { */
-	      /* 	  debug_board_write_str("Error occured with http_send!\n"); */
-	      /* 	  /\* __asm__ __volatile__("int3");  *\/ */
-	      /* 	  continue;/\* FIXME *\/ */
-	      /* 	} */
-	      /* 	remaining_length -= sent; */
-	      /* 	total_sent +=sent; */
-	      /* } */
-	      /* free(data_with_crlf); */
 
 	      poller->multipart_data = poller->multipart_data -> next;
 	      free(fragment);
@@ -607,34 +573,6 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 		  
 		  http_send(poller->http_handle, end_of_multipart, remaining_length);
 
-		  /* remaining_length = strlen(post_multipart_boundary) - 2; */
-		  /* char *end_of_multipart = malloc(remaining_length + 4 + 1); */
-		  /* int i; */
-		  /* for(i = 0; i < remaining_length; i++) */
-		  /*   end_of_multipart[i] = post_multipart_boundary[i]; */
-
-		  /* end_of_multipart[i++] = '-'; */
-		  /* end_of_multipart[i++] = '-'; */
-		  /* end_of_multipart[i++] = '\r'; */
-		  /* end_of_multipart[i++] = '\n'; */
-		  /* end_of_multipart[i++] = '\0'; */
-		
-		  /* remaining_length += 4; */
-		  
-		  /* /\* sprintf(end_of_multipart, "%s--\r\n", post_multipart_boundary); *\/ */
-		  
-		  /* while(remaining_length > 0) { */
-		  /*   sent = http_send_asm(poller->http_handle, end_of_multipart + total_sent, remaining_length); */
-
-		  /*   if(sent == -1) { */
-		  /*     debug_board_write_str("Error occured with http_send with multipart!\n"); */
-		  /*     __asm__ __volatile__("int3"); */
-		  /*     continue;/\* FIXME *\/ */
-		  /*   } */
-		  /*   remaining_length -= sent; */
-		  /*   total_sent += sent; */
-		  /* } */
-
 		  /*Invert the direction after we have sent all multipart data */
 		  poller->transfer_direction = RECEIEVE;
 		}
@@ -650,27 +588,6 @@ GLOBAL_DESTROY = true;
 	    else {
 
 	      http_send(poller->http_handle, poller->urlenc_data, poller->content_length);
-
-	      /* int remaining_length = poller->content_length; */
-	      /* int total_sent = 0; */
-	      /* int sent = 0; */
-
-	      /* while(remaining_length > 0) */
-	      /* 	{ */
-	      /* 	  sent = http_send_asm(poller->http_handle, poller->urlenc_data + total_sent, remaining_length); */
-
-	      /* 	  if(sent == -1) { */
-	      /* 	    debug_board_write_str("Error occured with http_send for urlenc!\n"); */
-	      /* 	    __asm__ __volatile__("int3"); */
-	      /* 	    break; */
-	      /* 	  } */
-
-	      /* 	  remaining_length -= sent; */
-	      /* 	  total_sent += sent; */
-	      /* 	} */
-
-	      /* if(remaining_length > 0) continue; */
-	      
 	      poller->transfer_direction = RECEIEVE;
 	      poller->content_length = 0;
 	      poller = poller->next_kolibri_fetch;
