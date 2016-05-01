@@ -39,7 +39,7 @@ struct kolibri_fetch {
   int multipart_content_length;
   char *headers;
   http_type fetch_type;
-  http_direction transfer_direction;
+  http_direction transfer_direction; /* Drop this and handle POST and GET in a similar fashion  */
   char *url_string;
   char *location;  /* Only useful when redirected. */
   char *cookie_string;
@@ -57,6 +57,7 @@ struct kolibri_fetch {
 
 void process_headers(struct kolibri_fetch *);
 struct fetch_multipart_data* multipart_convert(struct fetch_multipart_data *control, int *content_length);
+void remove_fetcher_from_ring(struct kolibri_fetch *kfetch_to_free);
 
 struct kolibri_fetch *fetcher_head;
 /* http_handle for this dummy pointer is always NULL */
@@ -103,6 +104,7 @@ bool fetch_http_kolibri_initialise(lwc_string *scheme) {
   /* Should these be in register() instead? . Depends on if register is called once or this is called once */
 
   fetcher_head = malloc(sizeof(struct kolibri_fetch));
+  if(fetcher_head == NULL) { debug_board_write_str("Failed to allocate fetcher head. Aborting \n"); __asm__ __volatile__("int3"); }
   fetcher_head -> http_handle = NULL;
   fetcher_head -> next_kolibri_fetch = NULL;
 
@@ -137,7 +139,10 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
 		const char **headers) {
 
   struct kolibri_fetch *new_kfetcher = malloc(sizeof(struct kolibri_fetch));
-  char addr[100];
+  if(new_kfetcher == NULL) { debug_board_write_str("Failed to allocate new_kfetcher. Aborting \n"); __asm__ __volatile__("int3"); }
+  FILE* setup_file = fopen("/tmp0/1/setup.txt", "a");
+  fprintf(setup_file, "Setup for %s\n", nsurl_access(url));
+  fclose(setup_file);
 
   new_kfetcher -> next_kolibri_fetch = NULL;
   new_kfetcher -> fetch_handle = parent_fetch;
@@ -156,7 +161,10 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
   new_kfetcher -> multipart_data = NULL;
   new_kfetcher -> multipart_content_length = 0;
   new_kfetcher -> urlenc_data = NULL;
-  
+
+ /* FIXME: Add referrer header , Check curl fetcher */
+ /*    FIXME: Add cookie for all known hosts to post requests as well */
+
   char *header_creator = new_kfetcher->headers;
   int total_length_headers = 0;
   int header_count = 0;
@@ -165,9 +173,6 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
     total_length_headers += strlen(headers[header_count]);
 
   if(header_count!=0) { /* We found some headers */
-    //debug_board_write_str("header_count != 0");
-    /* __asm__ __volatile__("int3"); */
-
     int j;
 
     /*Include CRLF for each header line */
@@ -184,7 +189,7 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
 
     if(header_creator == NULL) {
       debug_board_write_str("Error: Could not allocate header string.\n");
-      /* __asm__ __volatile__("int3"); */
+      __asm__ __volatile__("int3");
 
       return NULL;
     }
@@ -198,9 +203,9 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
       int headerlen = strlen(headers[j]);
       strncpy(header_creator, headers[j], headerlen);
       header_creator+=headerlen;
-      *header_creator = '\n';
-      header_creator++;
       *header_creator = '\r';
+      header_creator++;
+      *header_creator = '\n';
       header_creator++;
     }
 
@@ -253,7 +258,6 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
     new_kfetcher -> urlenc_data = strdup(post_urlenc);
     new_kfetcher -> transfer_direction = SEND;
     new_kfetcher -> content_length = strlen(post_urlenc);
-
   }
   else {
     new_kfetcher -> fetch_type = HTTP_GET;
@@ -284,53 +288,81 @@ void * fetch_http_kolibri_setup(struct fetch *parent_fetch, struct nsurl *url,
 }
 
 bool fetch_http_kolibri_start(void *kfetch) {
-  /* debug_board_write_str("HTTP_START : "); */
   struct kolibri_fetch *fetch = (struct kolibri_fetch *)kfetch;
 
-  /* FIXME: add true or false return depending upon http_get_asm return value */
-
-  /* debug_board_write_str(fetch->url_string); */
-  /* debug_board_write_str("\n"); */
-
   if(fetch -> urlenc_data) {
-    /* debug_board_write_str("Trying POST\n"); */
 
     fetch->http_handle = http_post_asm(fetch->url_string, NULL, 0, fetch->headers,
 				       post_type_urlencoded,
 				       strlen(fetch->urlenc_data));
+
+    if(fetch -> http_handle == NULL) {
+      debug_board_write_str("HTTPLIB: Cannot do URLENC POST. Aborting.\n");
+      return false;
+    }
+
+    debug_board_write_str("Doing http_send for post_urlenc\n");
+    http_send(fetch->http_handle, fetch->urlenc_data, fetch->content_length);
+    debug_board_write_str("Done http_send for post_urlenc\n");
+
   }
   else if(fetch -> multipart_data) {
 
-    debug_board_write_str("Sending headers for multipart\n\n");
-    /* __asm__ __volatile__("int3"); */
-    char datax[100];
-    sprintf(datax, "Content->length = %d\n", fetch->multipart_content_length);
-    debug_board_write_str(datax);
-
-
-    
     fetch->http_handle = http_post_asm(fetch->url_string, NULL, 0, fetch->headers,
 				       post_type_multipart,
 				       fetch->multipart_content_length);
 
-    debug_board_write_str("Done Sending headers for multipart\n\n");
-    /* __asm__ __volatile__("int3"); */
+    if(fetch -> http_handle == NULL) {
+      debug_board_write_str("HTTPLIB: Cannot do MULTIPART POST. Aborting.\n");
+      return false;
+    }
+
+    while(fetch->multipart_data) {
+
+      struct multipart_data_fragment *fragment = fetch->multipart_data;
+      http_send(fetch->http_handle, fragment->header_line, fragment->length_header);
+
+      char *data_with_crlf = malloc(fragment->length - fragment->length_header + 1);
+      if(data_with_crlf == NULL) { debug_board_write_str("data with crlf failed to allocate. Aborting \n"); __asm__ __volatile__("int3"); }
+      sprintf(data_with_crlf, "%s\r\n", fragment->data_or_filename == NULL ? "" : fragment->data_or_filename);
+      http_send(fetch->http_handle, data_with_crlf, fragment->length - fragment->length_header);
+      free(data_with_crlf);
+
+      fetch->multipart_data = fetch->multipart_data -> next;
+      free(fragment);
+    }
+
+    /* We need to send : --(boundary-string without last 2 characters)--\r\n
+
+    /* +2 for 2 prefixed dashes . Add it later. */
+    int remaining_length = strlen(post_multipart_boundary) + 4;
+    char *end_of_multipart = malloc(remaining_length + 1);
+
+  if(end_of_multipart == NULL) { debug_board_write_str("Failed to allocate endhfetcher_head . Aborting \n"); __asm__ __volatile__("int3"); }
+
+  sprintf(end_of_multipart, "--%s", post_multipart_boundary);
+  int i = strlen(post_multipart_boundary);
+
+  end_of_multipart[i++] = '-';
+  end_of_multipart[i++] = '-';
+  end_of_multipart[i++] = '\r';
+  end_of_multipart[i++] = '\n';
+  end_of_multipart[i++] = '\0';
+
+  http_send(fetch->http_handle, end_of_multipart, remaining_length);
   }
   else {
-    /* debug_board_write_str("Trying GET\n"); */
-    fetch->http_handle = http_get_asm(fetch->url_string, 0, 0, fetch->headers);
-  }
+    debug_board_write_str("HTTP GET: ");
+    debug_board_write_str(fetch->url_string);
+    debug_board_write_str("\n");
 
-  if(fetch -> http_handle == NULL) {
-    debug_board_write_str("Failed to allocate http handle. Aborting.\n");
-    return false;
-  }
-  else
-    {
-      /* char addr[400]; */
-      /* sprintf(addr, "for URL: %s, Address: %p\n", fetch->url_string, (void*)(fetch->http_handle)); */
-      /* debug_board_write_str(addr); */
+    fetch->http_handle = http_get_asm(fetch->url_string, 0, 0, fetch->headers);
+
+    if(fetch -> http_handle == NULL) {
+      debug_board_write_str("HTTPLIB: Cannot do HTTP GET. Aborting.\n");
+      return false;
     }
+  }
 
   /* Add this fetcher to the fetch ring */
   struct kolibri_fetch *f = fetcher_head;
@@ -353,6 +385,10 @@ void fetch_http_kolibri_abort(void *fetch) {
   /* debug_board_write_str("kolibri_http_abort called.!!\n"); */
 
   fetch_remove_from_queues(f->fetch_handle);
+  remove_fetcher_from_ring(f);
+
+  /* fetch_free(f->fetch_handle); */
+
   /* FIXME: Write a function to remove handle from our linked list */
   /* Call it here in abort because we don't want to poll them anymore */
 
@@ -361,11 +397,11 @@ void fetch_http_kolibri_abort(void *fetch) {
 
 }
 
-void fetch_http_kolibri_free(void *kfetch) {
+void remove_fetcher_from_ring(struct kolibri_fetch *kfetch_to_free) {
 
-  /* debug_board_write_str("Inside fetch_http_kolibri_free!!!!\n"); */
+  /* We don't free the fetcher here or change it's next member */
+  /*   We do this so that the caller can still use the next member to traverse the list ahead */
 
-  struct kolibri_fetch *kfetch_to_free = (struct kolibri_fetch *)kfetch;
   struct kolibri_fetch *delete_ptr = fetcher_head;
 
   if(kfetch_to_free && kfetch_to_free->http_handle)
@@ -387,6 +423,15 @@ void fetch_http_kolibri_free(void *kfetch) {
 
     delete_ptr=delete_ptr->next_kolibri_fetch;
   }
+}
+
+
+void fetch_http_kolibri_free(void *kfetch) {
+
+  /* debug_board_write_str("Inside fetch_http_kolibri_free!!!!\n"); */
+  struct kolibri_fetch *kfetch_to_free = (struct kolibri_fetch *)kfetch;
+
+  remove_fetcher_from_ring(kfetch_to_free);
 
   free(kfetch_to_free);
 
@@ -403,172 +448,70 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 
   while(poller!=NULL)
     {
-      if(poller->abort == true) {
+      if(poller->abort == true || poller->finished == true) {
 	poller = poller->next_kolibri_fetch;
 	continue;
       }
 
-      if(poller->transfer_complete == false) {
+      int x = http_receive_asm(poller->http_handle);
 
-	if(poller->transfer_direction == RECEIEVE) {
-	  char datax[500];
-	  sprintf(datax, "Receiving for: %s with http at %p\n", poller->url_string, poller->http_handle);
-	  debug_board_write_str(datax);
+      if(!poller->headers_processed && (poller->http_handle->flags & HTTP_GOT_HEADER))
+	  process_headers(poller);
 
-	  int x = http_receive_asm(poller->http_handle);
+      if(x == 0) {
+	/* We got all the data there is to this handle */
 
-	  if(!poller->headers_processed && (poller->http_handle->flags & HTTP_GOT_HEADER))
-	    {
-	      debug_board_write_str("Process Headers for : \n");
-	      debug_board_write_str(poller->url_string);
-	      debug_board_write_str("\n");
-	      process_headers(poller);
-	    }
+	poller->transfer_complete = true;
+	if(poller->redirected) {
 
-	  if(x == 0)
-	      poller->transfer_complete = true;
-	  else {
-	    poller = poller->next_kolibri_fetch;
-	    continue;
-	  }
+	  FILE* setup_file = fopen("/tmp0/1/setup.txt", "a");
+	  fprintf(setup_file, "Redirected for %s TO %s\n", poller->url_string, poller->location);
+	  fclose(setup_file);
 	}
-	else /* if transfer_direction == SEND */
-	  {
-	    if(poller->multipart_data) {
+	else if(poller->abort) {
+	  debug_board_write_str("Aborted.\n");
 
-	      struct multipart_data_fragment *fragment = poller->multipart_data;
-	      http_send(poller->http_handle, fragment->header_line, fragment->length_header);
+	  FILE* setup_file = fopen("/tmp0/1/setup.txt", "a");
+	  fprintf(setup_file, "Aborted for %s\n", poller->url_string);
+	  fclose(setup_file);
 
-	      char *data_with_crlf = malloc(remaining_length + 1);
-	      sprintf(data_with_crlf, "%s\r\n", fragment->data_or_filename == NULL ? "" : fragment->data_or_filename);
-	      http_send(poller->http_handle, data_with_crlf, fragment->length - fragment->length_header);
-	      free(data_with_crlf);
+	  fetch_abort(poller->fetch_handle);
+	}
+	else {
+	  debug_board_write_str("200 OK!!!\n");
 
-	      poller->multipart_data = poller->multipart_data -> next;
-	      free(fragment);
+	  FILE* setup_file = fopen("/tmp0/1/setup.txt", "a");
+	  fprintf(setup_file, "Finished for %s\n", poller->url_string);
 
-	      if(poller->multipart_data == NULL)
-		{
-		  int remaining_length = strlen(post_multipart_boundary) - 2;
-		  char *end_of_multipart = malloc(remaining_length + 4 + 1);
-		  int i;
-
-		  for(i = 0; i < remaining_length; i++)
-		    end_of_multipart[i] = post_multipart_boundary[i];
-
-		  end_of_multipart[i++] = '-';
-		  end_of_multipart[i++] = '-';
-		  end_of_multipart[i++] = '\r';
-		  end_of_multipart[i++] = '\n';
-		  end_of_multipart[i++] = '\0';
-
-		  remaining_length += 4;
-		  
-		  http_send(poller->http_handle, end_of_multipart, remaining_length);
-
-		  /*Invert the direction after we have sent all multipart data */
-		  poller->transfer_direction = RECEIEVE;
-		}
-
-	      debug_board_write_str("Everything done for multipart!");
-	      /* __asm__ __volatile__("int3"); */
-
-	      poller = poller->next_kolibri_fetch;
-	      continue;
-	    }
-	    else {
-
-	      http_send(poller->http_handle, poller->urlenc_data, poller->content_length);
-	      poller->transfer_direction = RECEIEVE;
-	      poller->content_length = 0;
-	      poller = poller->next_kolibri_fetch;
-	    }
+	  if(poller->url_string == NULL) {
+	    debug_board_write_str("URL is NULL!\n");
+	    __asm__ __volatile__("int3");
 	  }
-      }
-    
-      if((poller -> finished == false && poller->transfer_complete == true)) {
-	if(poller->transfer_direction == RECEIEVE)
-	  {
+
+	  fclose(setup_file);
+
+	  if(poller->http_handle->content_received) {
 	    fetch_msg msg;
-	    unsigned int http_code = poller->http_handle->status;
-	    fetch_set_http_code(poller->fetch_handle, http_code);
+	    msg.type = FETCH_DATA;
+	    msg.data.header_or_data.buf = (const uint8_t *) poller -> http_handle -> content_ptr;
+	    msg.data.header_or_data.len = (size_t) poller -> http_handle -> content_length;
+	    fetch_send_callback(&msg, poller->fetch_handle);
+	  }
 
-	    if(http_code == 200) {
+	  fetch_msg msg;
+	  msg.type = FETCH_FINISHED;
+	  fetch_send_callback(&msg, poller->fetch_handle);
+	  poller->finished = true;
+	  fetch_remove_from_queues(poller->fetch_handle);
 
-	      msg.type = FETCH_DATA;
-	      msg.data.header_or_data.buf = (const uint8_t *) poller -> http_handle -> content_ptr;
-	      msg.data.header_or_data.len = (size_t) poller -> http_handle -> content_length;
-	      fetch_send_callback(&msg, poller->fetch_handle);
-	      poller->data_processed = true;
-	    }
-	    else if (300 <= http_code && http_code < 400) {
-	      if(http_code == 301 || http_code == 302) {
-		if(poller->location) {
-		  msg.type = FETCH_REDIRECT;
+	  remove_fetcher_from_ring(poller);
 
-		  msg.data.redirect = poller->location;
-		  fetch_send_callback(&msg, poller->fetch_handle);
-		}
-		else {
-		  debug_board_write_str("Got 3xx redirect but no target URL.");
-		}
-	      }
-	      else {
-		/* Code is 3xx but not 301 or 302 */
-	      }
-	    }
-	    else if (400 <= http_code && http_code < 500) {
-	      if(http_code == 401) {
-		msg.type = FETCH_AUTH;
-		msg.data.auth.realm = poller->realm;
-		fetch_send_callback(&msg, poller->fetch_handle);
-	      }
-	      else if(http_code == 404) {
-		msg.type = FETCH_ERROR;
-		msg.data.error = messages_get("HTTP Code 404: Not found");
-		fetch_send_callback(&msg, poller->fetch_handle);
-		fetch_abort(poller->fetch_handle);
-	      }
-	      else {
-		msg.type = FETCH_ERROR;
-		msg.data.error = messages_get("HTTP Code 4xx: Client Error.");
-		fetch_send_callback(&msg, poller->fetch_handle);
-		fetch_abort(poller->fetch_handle);
-	      }
-	    }
-	    else if (http_code >= 500 && http_code < 600) {
-	      msg.type = FETCH_ERROR;
-	      msg.data.error = messages_get("HTTP Code 5xx: Internal Server Errors.");
-	      fetch_send_callback(&msg, poller->fetch_handle);
-	      fetch_abort(poller->fetch_handle);
-	    }
-	    else {
-	      msg.type = FETCH_ERROR;
-	      msg.data.error = messages_get("Got Unknown HTTP Code. Aborting.");
-	      fetch_send_callback(&msg, poller->fetch_handle);
-	      fetch_abort(poller->fetch_handle);
-	    } /* End of handling http codes */
-
-	    if(poller->data_processed == true) {
-	      /* debug_board_write_str("Do FETCH_FINISHED\n"); */
-	      /* debug_board_write_str(poller->url_string); */
-	      /* debug_board_write_str("\n"); */
-	      //__asm__ __volatile__("int3");
-
-	      msg.type = FETCH_FINISHED;
-	      fetch_send_callback(&msg, poller->fetch_handle);
-	      poller->finished = true;
-
-	      /* FIXME: Properly free the fetcher and http handle */
-	      fetch_remove_from_queues(poller->fetch_handle);
-	      fetch_abort(poller->fetch_handle);
-	    }
-	  } /* End of if direction == RECEIEVE */
+	  /* fetch_free(poller->fetch_handle); */
+	  /* FIXME: Free the fetcher as well? */
+	}
       }
-      else if(poller->finished == true) {
-	/* time to free the fetcher  */
-      }
-      poller = poller -> next_kolibri_fetch;
+
+      poller = poller->next_kolibri_fetch;
     }
 }
 
@@ -749,6 +692,9 @@ time_t kolibri_getdate(char *datestring)
 
 void process_headers(struct kolibri_fetch *poller) {
 
+  FILE *headers_received = fopen("/tmp0/1/headers.txt", "a");
+  fprintf(headers_received, "For URL: %s\n", poller->url_string);
+
   fetch_msg msg;
 
   if(poller->headers_processed == false) {
@@ -756,18 +702,11 @@ void process_headers(struct kolibri_fetch *poller) {
     size_t header_length;
     char *header;
 
-    /* debug_board_write_str("Do FETCH_HEADER\n"); */
     msg.type = FETCH_HEADER;
 
-    /* msg.data.header_or_data.len = (size_t) poller -> http_handle -> header_length; */
-    /* msg.data.header_or_data.buf = (const uint8_t *)(&(poller -> http_handle -> http_header)); */
-
-    /* debug_board_write_str("Remove board log file\n"); */
-    /* __asm__ __volatile__("int3"); */
     char *headers_copy = NULL;
-
     if(headers_copy = (char *)malloc(poller->http_handle->header_length + 1)) {
-
+  if(headers_copy == NULL) { debug_board_write_str("Failed to allocate headers_copy. Aborting \n"); __asm__ __volatile__("int3"); }
       strncpy(headers_copy, (&(poller->http_handle->http_header)), poller->http_handle->header_length);
       headers_copy[poller->http_handle->header_length] = '\0';
 
@@ -781,6 +720,8 @@ void process_headers(struct kolibri_fetch *poller) {
 	debug_board_write_str(foo);
 	debug_board_write_str("\n");
 	}
+
+	fprintf(headers_received, "%s\n", foo);
 
 	msg.data.header_or_data.len = strlen(foo);
 	msg.data.header_or_data.buf = (const uint8_t *) foo;
@@ -807,10 +748,33 @@ void process_headers(struct kolibri_fetch *poller) {
     /* __asm__ __volatile__("int3"); */
   }
 
-  poller->headers_processed = true;
+  unsigned int http_code = poller->http_handle->status;
+  fetch_set_http_code(poller->fetch_handle, http_code);
 
-  /* debug_board_write_str("Headers processed\n"); */
-  /* __asm__ __volatile__("int3"); */
+  if(http_code >= 200 && http_code < 300 ) {
+    /* Good case . Mark nothing */
+  }
+  else if(http_code == 301 || http_code == 302) {
+    if(poller->location) {
+      poller->redirected = true;
+      msg.type = FETCH_REDIRECT;
+      msg.data.redirect = poller->location;
+      fetch_send_callback(&msg, poller->fetch_handle);
+    }
+  }
+  else if(http_code == 401) {
+    poller->abort = true;
+    msg.type = FETCH_AUTH;
+    fetch_send_callback(&msg, poller->fetch_handle);
+  }
+  else {
+    poller->abort = true;
+    msg.type = FETCH_ERROR;
+    fetch_send_callback(&msg, poller->fetch_handle);
+  }
+
+  poller->headers_processed = true;
+  fclose(headers_received);
 }
 
 struct fetch_multipart_data* multipart_convert(struct fetch_multipart_data *control, int *content_length)
@@ -818,17 +782,16 @@ struct fetch_multipart_data* multipart_convert(struct fetch_multipart_data *cont
  /* FIXME: Fix this function to do a stat on filenames and get their size. After that, the filesize should be added */
  /*        to content_length pointer (the second parameter to function  */
 
-  FILE *httplog =  NULL;
-
   struct multipart_data_fragment *free_me = malloc(sizeof(struct multipart_data_fragment));
   struct multipart_data_fragment *creator = NULL;
   struct multipart_data_fragment *to_be_freed = free_me;
   struct multipart_data_fragment *to_be_returned = NULL;
 
+  if(free_me == NULL) { debug_board_write_str("Failed to allocate free_me. Aborting \n"); __asm__ __volatile__("int3"); }
+
   for (; control; control = control->next) {
     creator = malloc(sizeof(struct multipart_data_fragment));
-          httplog = fopen("/tmp0/1/httplog.txt", "a");
-
+  if(creator == NULL) { debug_board_write_str("Failed to allocate creator. Aborting \n"); __asm__ __volatile__("int3"); }
 
     if(control->file) {
 
@@ -836,8 +799,10 @@ struct fetch_multipart_data* multipart_convert(struct fetch_multipart_data *cont
       /* malloc, ending 1 + 4 + 1 : EndQuote + CRLF + CRLF + NULLBYTE */
       creator->header_line = (char *)malloc(strlen(post_multipart_boundary) + 38 + strlen(control->name) + 13 + strlen(control->rawfile) + 1 + 4 + 1);
 
+  if(creator->header_line == NULL) { debug_board_write_str("Failed to allocate creator->header_line. Aborting \n"); __asm__ __volatile__("int3"); }
+
       sprintf(creator->header_line, "--%sContent-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\nContent-Type: application/octet-stream\r\n\r\n", post_multipart_boundary, control->name, control->rawfile);
-      
+
       creator->data_or_filename = strdup(control->rawfile);
 
       /*FIXME: Fix this stat call and file size getting */
@@ -846,12 +811,13 @@ struct fetch_multipart_data* multipart_convert(struct fetch_multipart_data *cont
       creator->length_header = strlen(creator->header_line);
       creator->length = creator->length_header + 2 ;
       *content_length += creator->length;
-    }    
+    }
     else {
       /* Content-Disposition: form-data; name="foo" */
       creator->header_line = (char *)malloc(strlen(post_multipart_boundary) + 38 + strlen(control->name) + 1 + 4 + 1);
+      if(creator->header_line == NULL) { debug_board_write_str("Failed to allocate creator->header_line. Aborting \n"); __asm__ __volatile__("int3"); }
 
-      sprintf(creator->header_line, "--%sContent-Disposition: form-data; name=\"%s\"\r\n\r\n", post_multipart_boundary, 
+      sprintf(creator->header_line, "--%sContent-Disposition: form-data; name=\"%s\"\r\n\r\n", post_multipart_boundary,
 	      control->name);
 
       creator->data_or_filename = strdup(control->value);
@@ -861,23 +827,17 @@ struct fetch_multipart_data* multipart_convert(struct fetch_multipart_data *cont
     }
     creator -> next = NULL;
 
-    fprintf(httplog, "line: %s", creator->header_line);
-    fprintf(httplog, "value: %s", creator->data_or_filename);
-    fprintf(httplog, "\nLength: %d", creator->length_header);
-    fprintf(httplog, "\nTotal length: %d\n", creator->length);
-    fclose(httplog);
-
     free_me->next = creator;
     free_me = free_me->next;
   }
-  
+
   to_be_returned = to_be_freed -> next;
   free(to_be_freed);
 
-  /* __asm__ __volatile__("int3"); */
-  /*Compensate for ending boundary and --/r/n to be sent over the network */
+  /*Compensate for ending boundary and --\r\n to be sent over the network */
   /* -2 because we don't want a CRLF after end of boundary at end of multipart */
-  *content_length += strlen(post_multipart_boundary) + 4 - 2;
+  /* +2 because we want equal number of dashes as others  */
+  *content_length += strlen(post_multipart_boundary) + 4 - 2 + 2;
 
   return to_be_returned;
 }
