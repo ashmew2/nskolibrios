@@ -326,10 +326,18 @@ bool fetch_http_kolibri_start(void *kfetch) {
       if(data_with_crlf == NULL) { debug_board_write_str("data with crlf failed to allocate. Aborting \n"); __asm__ __volatile__("int3"); }
       sprintf(data_with_crlf, "%s\r\n", fragment->data_or_filename == NULL ? "" : fragment->data_or_filename);
       http_send(fetch->http_handle, data_with_crlf, fragment->length - fragment->length_header);
+
+      FILE* freelog = fopen("/tmp0/1/freelog.txt", "a");
+      fprintf(freelog, "Freeing data_with_crlf\n");
       free(data_with_crlf);
+      fprintf(freelog, "Freed data_with_crlf\n");
 
       fetch->multipart_data = fetch->multipart_data -> next;
+
+      fprintf(freelog, "Freeing fragment\n");
       free(fragment);
+      fprintf(freelog, "Freed fragment\n");
+      fclose(freelog);
     }
 
     /* We need to send : --(boundary-string without last 2 characters)--\r\n
@@ -404,13 +412,6 @@ void remove_fetcher_from_ring(struct kolibri_fetch *kfetch_to_free) {
 
   struct kolibri_fetch *delete_ptr = fetcher_head;
 
-  if(kfetch_to_free && kfetch_to_free->http_handle)
-    http_free_asm(kfetch_to_free -> http_handle);
-  else
-    {
-    /* debug_board_write_str("Fetch already freed. Skipping\n.\n"); */
-    return;
-    }
 
   /* Remove this fetcher handle from the linked list */
 
@@ -431,9 +432,26 @@ void fetch_http_kolibri_free(void *kfetch) {
   /* debug_board_write_str("Inside fetch_http_kolibri_free!!!!\n"); */
   struct kolibri_fetch *kfetch_to_free = (struct kolibri_fetch *)kfetch;
 
+  if(!kfetch_to_free)
+    return;
+
   remove_fetcher_from_ring(kfetch_to_free);
 
+  if(kfetch_to_free->http_handle) {
+    http_disconnect_asm(kfetch_to_free -> http_handle);
+    http_free_asm(kfetch_to_free -> http_handle);
+  }
+  else
+    {
+    /* debug_board_write_str("Fetch already freed. Skipping\n.\n"); */
+    return;
+    }
+
+  FILE* freelog = fopen("/tmp0/1/freelog.txt", "a");
+  fprintf(freelog, "Freeing kfetch_to_free\n");
   free(kfetch_to_free);
+  fprintf(freelog, "Freed kfetch_to_free\n");
+  fclose(freelog);
 
     /* print_linked_list(); */
 }
@@ -462,19 +480,18 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	/* We got all the data there is to this handle */
 
 	poller->transfer_complete = true;
-	if(poller->redirected) {
-
-	  FILE* setup_file = fopen("/tmp0/1/setup.txt", "a");
-	  fprintf(setup_file, "Redirected for %s TO %s\n", poller->url_string, poller->location);
-	  fclose(setup_file);
-	}
-	else if(poller->abort) {
+	/* if(poller->redirected) { */
+	/* /\* FIXME: Merge this mofu with 200 OK else{} part below *\/ */
+	/*   FILE* setup_file = fopen("/tmp0/1/setup.txt", "a"); */
+	/*   fprintf(setup_file, "Redirected for %s TO %s\n", poller->url_string, poller->location); */
+	/*   fclose(setup_file); */
+	/* } */
+	if(poller->abort && !poller->redirected) {
 	  debug_board_write_str("Aborted.\n");
 
 	  FILE* setup_file = fopen("/tmp0/1/setup.txt", "a");
 	  fprintf(setup_file, "Aborted for %s\n", poller->url_string);
 	  fclose(setup_file);
-
 	  fetch_abort(poller->fetch_handle);
 	}
 	else {
@@ -509,9 +526,15 @@ void fetch_http_kolibri_poll(lwc_string *scheme) {
 	  /* fetch_free(poller->fetch_handle); */
 	  /* FIXME: Free the fetcher as well? */
 	}
-      }
 
-      poller = poller->next_kolibri_fetch;
+	struct kolibri_fetch *yolo = poller->next_kolibri_fetch;
+	debug_board_write_str("Calling fetch_free!");
+	__asm__ __volatile__("int3");
+	fetch_free(poller->fetch_handle);
+	poller = yolo;
+      }
+      else
+	poller = poller->next_kolibri_fetch;
     }
 }
 
@@ -740,7 +763,12 @@ void process_headers(struct kolibri_fetch *poller) {
 	foo = strtok(NULL, "\r\n");
       }
 
+            FILE* freelog = fopen("/tmp0/1/freelog.txt", "a");
+      fprintf(freelog, "Freeing headers_copy\n");
       free(headers_copy);
+      fprintf(freelog, "Freed headers_copy\n");
+      fclose(freelog);
+
     }
     else {
       debug_board_write_str("Can't parse headers. Malloc failed.\n");
@@ -832,7 +860,11 @@ struct fetch_multipart_data* multipart_convert(struct fetch_multipart_data *cont
   }
 
   to_be_returned = to_be_freed -> next;
-  free(to_be_freed);
+        FILE* freelog = fopen("/tmp0/1/freelog.txt", "a");
+      fprintf(freelog, "Freeing to_be_freed\n");
+      free(to_be_freed);
+      fprintf(freelog, "Freed to_be_freed\n");
+      fclose(freelog);
 
   /*Compensate for ending boundary and --\r\n to be sent over the network */
   /* -2 because we don't want a CRLF after end of boundary at end of multipart */
