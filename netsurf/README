@@ -81,8 +81,9 @@ CSS Does not always load pretty graphics for the same website (For example board
 
 Handle netsurf command line handling arguments
 
-Remove hard coded paths about /usbhd0/1/ so that the binary can run from anywhere.
-
+===FIXED=== Remove hard coded paths about /usbhd0/1/ so that the binary can run from anywhere.
+	    Now you need to supply the path to the res/ directory as argument when running.
+	    
 No HTTPS (Half of the world uses it....Damn PolarSSL..)
 
 Handle TAB key to cycle through fields.
@@ -95,16 +96,15 @@ No Javascript.
 
 ===FIXED=== Entry boxes do not load.
 ===FIXED=== board.kolibrios.org crashes after some time.
-===FIXED=== Might crash for some sites (Especially for 404s). This seems to be fixed now. A crash now would be useful.
+
+Might crash randomly because of some malloc/free issue. Dereferencing NULL or wild pointers? Need investigation.
 
 ===FIXED=== No POST yet. Only GET.
 
 No FileSystem caching yet. Need to enable FS Backing Store.
 The caching can be enabled later when everything else is Working 100%.
 
-free() crashes for favicon string in url_unescape() function.
-       It is disabled for now, but we need it sooner or later.
-
+==FIXED== free() crashes for favicon string in url_unescape() function. It is disabled for now, but we need it sooner or later.
 There are too many debug statements around the code (including libs), remove them.
 
 Downloads probably won't work right now [ Untested, but best guessed ]
@@ -119,6 +119,6 @@ Stop feeding HTTP Header line to core.
 
 Merge to CI of Netsurf.
 
-Add support for multipart/form-data POST requests.
+===FIXED=== Add support for multipart/form-data POST requests.
 
 Add custom pages for 404 or 5xx errors like what "regular browsers" show. Designers! *Looks at Leency*
