@@ -82,7 +82,7 @@ CSS Does not always load pretty graphics for the same website (For example board
 Handle netsurf command line handling arguments
 
 ===FIXED=== Remove hard coded paths about /usbhd0/1/ so that the binary can run from anywhere.
-	    Now you need to supply the path to the res/ directory as argument when running.
+	    We just need to place res/ in the same directory as netsurf executable now.
 	    
 No HTTPS (Half of the world uses it....Damn PolarSSL..)
 

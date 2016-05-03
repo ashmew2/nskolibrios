@@ -30,6 +30,9 @@ char **respaths; /** resource search path vector */
  * is performed here, once, rather than every time a resource is
  * searched for.
  */
+
+/* FIXME: We dont need this in KolibriOS. */
+
 char **
 fb_init_resource(const char *resource_path)
 {

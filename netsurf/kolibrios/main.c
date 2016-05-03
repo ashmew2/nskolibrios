@@ -72,9 +72,9 @@
 /**************************************************
 Make life easier with these path specifiers here.
 ***************************************************/
-#define KOLIBRI_FONTFILE "/usbhd0/1/kolibrios/res/sans.ttf"
-#define KOLIBRI_RESPATH "/usbhd0/1/kolibrios/res/"
-#define FILE_KOLIBRI_RESPATH "file:///usbhd0/1/kolibrios/res/"
+/* #define KOLIBRI_FONTFILE "/usbhd0/1/kolibrios/res/sans.ttf" */
+/* #define KOLIBRI_RESPATH "/usbhd0/1/kolibrios/res/" */
+/* #define FILE_KOLIBRI_RESPATH "file:///usbhd0/1/kolibrios/res/" */
 /************************************************/
 
 char **respaths; /** resource search path vector */
@@ -119,10 +119,9 @@ static char **nskolibri_init_resource(const char *resource_path)
 static nserror set_defaults(struct nsoption_s *defaults)
 {
   /* Set defaults for absent option strings */
-  nsoption_setnull_charp(cookie_file, strdup("/usbhd0/1/Cookies"));
-  nsoption_setnull_charp(cookie_jar, strdup("/usbhd0/1/Cookies"));
+  nsoption_setnull_charp(cookie_file, *respaths);
+  nsoption_setnull_charp(cookie_jar, *respaths);
   //TODO: This creates an nsoptions error in macro expansion...
-  //  nsoption_setnull_charp(url_file, strdup("/usbhd0/1/URLs"));
 
   return NSERROR_OK;
 }
@@ -131,143 +130,6 @@ static nserror set_defaults(struct nsoption_s *defaults)
  * Main entry point from Kolibri OS.
  */
 extern struct http_msg;
-
-/* int main(int argc, char** argv) */
-/*     { */
-/*     nsurl *initial_url;   */
-/*     nserror ret; */
-/*     unsigned int os_event = KOLIBRI_EVENT_REDRAW; */
-
-/*     /\*Also makes sense to have a kolibri_init_libraries(); here which inits all the libraries we'll need *\/ */
-
-/*     /\* Need to handle the cookie jar somehow *\/ */
-/*     /\* First off, get the frontend connected with render engine of NS *\/ */
-/*     debug_board_write_str("Netsurf: Official port for KolibriOS.\n"); */
-      
-/*     struct netsurf_table nskolibri_table = { */
-/* 	/\* Tables in Use *\/ */
-/*         /\* Mandatory tables (From Monkey frontend) *\/ */
-/* 	.browser = &kolibri_browser_table, */
-/* 	.window = &kolibri_window_table, */
-/* 	.download = &kolibri_download_table, */
-/* 	.fetch = &kolibri_fetch_table, */
-/* 	.bitmap = &kolibri_bitmap_table, */
-
-/*         /\* Optional tables (Not in Monkey, so I assumed optional) *\/ */
-/* 	/\* TODO: Use them in the future, comment out for now for easy debug *\/ */
-/* 	/\* .clipboard = &kolibri_clipboard_table, *\/ */
-/* 	/\* .file = &kolibri_gui_file_table, *\/ */
-/* 	/\* .utf8 = &kolibri_gui_utf8_table, *\/ */
-/* 	/\* .search = &kolibri_gui_search_table, *\/ */
-/* 	/\* .search_web = &kolibri_search_web_table, *\/ */
-/* 	/\* .llcache = &kolibri_gui_llcache_table, *\/ */
-/* 	}; */
-
-/*     /\* Initialize KolibriOS related libraries which Netsurf will use *\/ */
-
-/*     /\* Initialize HTTP Library *\/ */
-/*     ret = kolibri_http_init(); */
-/*     if (ret == 0) */
-/*       debug_board_write_str("Netsurf: KolibriOS HTTP Library Initialized.\n"); */
-/*     else { */
-/*       debug_board_write_str("Netsurf: HTTP Library initialization failed..\n"); */
-/*       return ret; */
-/*     }       */
-/*     //      ; */
-/*       { */
-/* 	debug_board_write_str("Test get http\n"); */
-/* 	http_get_asm("www.kolibrios.org", 0, 0, 0); */
-/* 	debug_board_write_str("Tested get http\n"); */
-/*       } */
-/*   /\* Initialize BoxLib Library for GUI textboxes, etc *\/ */
-/*     ret = kolibri_gui_init(); */
-/*     if (ret == 0) */
-/*       debug_board_write_str("Netsurf: KolibriOS BOXLIB Library Initialized.\n"); */
-/*     else { */
-/*       debug_board_write_str("Netsurf: BOXLIB Library initialization failed..\n"); */
-/*       return ret; */
-/*     } */
-
-/*     /\* End of KolibriOS specific libraries initialization phase *\/ */
-/*     debug_board_write_str("Netsurf: Trying to register nskolibri_table.\n"); */
-/*     ret = netsurf_register(&nskolibri_table); */
-
-/*     if(ret == NSERROR_OK) */
-/*       debug_board_write_str("Netsurf for KolibriOS: Core Table Initialization Successful.\n"); */
-/*     else { */
-/*       debug_board_write_str("Netsurf: Fatal ERROR -> Core Table Initialization Failed.\n"); */
-/*       return ret; */
-/*     } */
-
-//respaths = nskolibri_init_resource("/usbhd0/1/kolibrios/fb/res");
-/*     debug_board_write_str("Initializing Netsurf Core."); */
-
-/*     ret = nsoption_init(set_defaults, &nsoptions, &nsoptions_default); */
-
-/*     if (ret != NSERROR_OK) { */
-/*       debug_board_write_str("Options failed to initialise\n"); */
-/*       return -2; */
-/*     } */
-
-/*     ret = netsurf_init(NULL); */
-/*     if(ret == NSERROR_OK) */
-/*       debug_board_write_str("netsurf_init Successful!. \n"); */
-/*     else { */
-/*       debug_board_write_str("netsurf_init Failed. Aborting Netsurf execution.\n"); */
-/*       return ret; */
-/*     } */
-
-/*     if (nsurl_create("http://www.kolibrios.org", &initial_url) == NSERROR_OK) */
-/*       { */
-/* 	nserror error = browser_window_create(BW_CREATE_HISTORY, */
-/* 				      initial_url, */
-/* 				      NULL, */
-/* 				      NULL, */
-/* 				      NULL); */
-/* 	nsurl_unref(initial_url); */
-/*       } */
-/*     else */
-/*       { */
-/* 	debug_board_write_str("Failed to create initial URL for Netsurf. Exiting.\n"); */
-/* 	return 2; */
-/*       } */
-    
-/*       do  /\* Start of main activity loop *\/ */
-/* 	{ */
-/* 	  char event[20]; */
-/* 	  sprintf(event, "ev: %u\n", os_event); */
-/* 	  debug_board_write_str(event); */
-
-/* 	  if(os_event == KOLIBRI_EVENT_REDRAW) */
-/* 	    { */
-/* 	      kolibri_handle_event_redraw(master_window); */
-/* 	    } */
-/* 	  else if(os_event == KOLIBRI_EVENT_KEY) */
-/* 	    { */
-/* 	      kolibri_handle_event_key(master_window); */
-/* 	    } */
-/* 	  else if(os_event == KOLIBRI_EVENT_BUTTON) */
-/* 	    { */
-/* 	      unsigned int pressed_button = kolibri_button_get_identifier(); */
-
-/* 	      /\* if(pressed_button = 0x00123456) /\\* Our button was pressed *\\/ *\/ */
-/* 	      /\* 	{ *\/ */
-/* 	      /\* 	  if(checkbox -> flags & CHECKBOX_IS_SET) /\\* Append BoardMsg checkbox is set *\\/ *\/ */
-/* 	      /\* 	    debug_board_write_str("BOARDMSG: "); *\/ */
-
-/* 	      /\* 	  debug_board_write_str(textbox->text); *\/ */
-/* 	      /\* 	  debug_board_write_str("\n"); *\/ */
-/* 	      /\* 	} *\/ */
-/* 	    } */
-/* 	  else if(os_event == KOLIBRI_EVENT_MOUSE) */
-/* 	    { */
-/* 	      kolibri_handle_event_mouse(master_window); */
-/* 	    } */
-/* 	} while(os_event = get_os_event()); /\* End of main activity loop *\/ */
-      
-/*     return 0; */
-
-/*     } /\* End of main() *\/ */
 
 int
 main(int argc, char** argv)
@@ -287,6 +149,8 @@ main(int argc, char** argv)
 		.utf8 = framebuffer_utf8_table,
 		.bitmap = framebuffer_bitmap_table,
 	};
+
+    
 
     /* Initialize HTTP Library */
     ret = kolibri_http_init();
@@ -314,8 +178,35 @@ main(int argc, char** argv)
       die("NetSurf operation table failed registration");
     }
 
-    respaths = fb_init_resource("/usbhd0/1/kolibrios/fb/res/");
+    /* Drop the last slash if caller provided it. */
 
+    char current_dir[100];
+    int i = 0;
+
+    for(i = strlen(argv[0]); i>=0; i--)
+      {
+	if(argv[0][i]=='/') {
+	  strncpy(current_dir, argv[0], i+1);
+	  i++;
+	  current_dir[i++] = 'r';
+	  current_dir[i++] = 'e';
+	  current_dir[i++] = 's';
+	  current_dir[i++] = '\0';
+	  break;
+	}
+      }
+
+
+    respaths = (char **) malloc(sizeof(char **));
+    *respaths = malloc(i);
+    strcpy(*respaths, current_dir);
+
+    debug_board_write_str("CWD: ");
+    debug_board_write_str(*respaths);
+    debug_board_write_str("\n");
+
+    /* __asm__ __volatile__("int3"); */
+    
     /* initialise logging. Not fatal if it fails but not much we
      * can do about it either.
      */
@@ -375,8 +266,8 @@ main(int argc, char** argv)
     febpp = 32;
     fewidth = 800;
     feheight = 600;
-    feurl = "http://board.kolibrios.org/";
-    //    feurl = "wiki.osdev.org/Main_Page";
+
+    feurl = "board.kolibrios.org/ucp.php?i=pm&mode=compose";
     nsfb = framebuffer_initialise(fename, fewidth, feheight, febpp);
     if (nsfb == NULL)
       die("Unable to initialise framebuffer");
@@ -427,6 +318,8 @@ main(int argc, char** argv)
 
     /* finalise options */
     nsoption_finalise(nsoptions, nsoptions_default);
-
+    
+    free(*respaths);
+    free(respaths);
     return 0;
 }

@@ -70,7 +70,6 @@ static bool fetch_data_initialise(lwc_string *scheme)
 static void fetch_data_finalise(lwc_string *scheme)
 {
 	LOG("fetch_data_finalise called for %s", lwc_string_data(scheme));
-	/* TODO: http_kolibri_handle_cleanup(khttp_handle); */
 }
 
 static bool fetch_data_can_fetch(const nsurl *url)
@@ -231,6 +230,17 @@ static bool fetch_data_process(struct fetch_data_context *c)
 		c->datalen = unescaped_len;
 		memcpy(c->data, unescaped, unescaped_len);
 	}
+
+	int val;
+    __asm__ __volatile__(
+    "int $0x40"
+    :"=a"(val)
+    :"a"(68),"b"(13),"c"(unescaped));
+
+    if(val != 1) {
+      debug_board_write_str("Failed to free block with SF 68,13.!\n");
+      __asm__ __volatile__("int3");
+    }
 	
  /* FIXME: Should we use mcall 68,13 to free the buffer? Should we do strdup */
  /*        and stay away from assembly madness ? :D  */
@@ -263,9 +273,8 @@ static void fetch_data_poll(lwc_string *scheme)
 		/* Only process non-aborted fetches */
 		if (c->aborted == false && fetch_data_process(c) == true) {
 			char header[64];
-
 			fetch_set_http_code(c->parent_fetch, 200);
-			LOG("setting data: MIME type to %s, length to %zd", c->mimetype, c->datalen);
+			/* LOG("setting data: MIME type to %s, length to %zd", c->mimetype, c->datalen); */
 			/* Any callback can result in the fetch being aborted.
 			 * Therefore, we _must_ check for this after _every_
 			 * call to fetch_data_send_callback().

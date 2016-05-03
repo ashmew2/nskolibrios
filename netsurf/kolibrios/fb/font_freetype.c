@@ -118,6 +118,8 @@ fb_new_face(const char *option, const char *resname, const char *fontname)
 		/* debug_board_write_str("Option is Not NULL\n"); */
                 newf->fontfile = strdup(option);
         } else {
+		char *fontpath = malloc(strlen(*respaths) + 10);
+		sprintf(fontpath, "%s/sans.ttf", *respaths);
 		//debug_board_write_str("Option is NULL\n");
 		//debug_board_write_str("respaths = ");
 		//debug_board_write_str(respaths);
@@ -125,10 +127,11 @@ fb_new_face(const char *option, const char *resname, const char *fontname)
 		//debug_board_write_str(fontname);
 		//debug_board_write_str("\n");
 
-#define KOLIBRI_FONTFILE "/usbhd0/1/kolibrios/res/sans.ttf"
-
 		filepath_sfind(respaths, buf, fontname);
-                newf->fontfile = KOLIBRI_FONTFILE;
+
+                newf->fontfile = strdup(fontpath);
+		debug_board_write_str(newf->fontfile);
+
 		//strdup(buf);
         }
 	//debug_board_write_str("newf->fontfile = ");
