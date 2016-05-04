@@ -66,8 +66,6 @@ ISSUES
 ====
 
 Slow Page loading times.
-We first download all data and then inform the core. This should be done as the chunks are received to help overall latency.
-My priority is stability first then speed. Once I feel the HTTP and CSS loading and status code handling is stable, I will try to look into this. Not a priority at the moment IMHO.
 
 ===FIXED=== Handle Headers , especially cookies to handle maintaining sessions. Right now it'll just keep kicking you out if you try to log onto a site.
 
@@ -90,18 +88,22 @@ Handle TAB key to cycle through fields.
 
 Polish and Finish kolibri surface for libnsfb.
 
-No image support yet.
+===FIXED=== No image support yet. We have PNG!
+
+JPEG Support.
+GIF Support.
 
 No Javascript.
 
 ===FIXED=== Entry boxes do not load.
 ===FIXED=== board.kolibrios.org crashes after some time.
 
-Might crash randomly because of some malloc/free issue. Dereferencing NULL or wild pointers? Need investigation.
+Might crash randomly because of some malloc/free issues after an HTTP POST.
 
 ===FIXED=== No POST yet. Only GET.
 
 No FileSystem caching yet. Need to enable FS Backing Store.
+Caching is disabled , especially If-modified-since and if-none-match headers.
 The caching can be enabled later when everything else is Working 100%.
 
 ==FIXED== free() crashes for favicon string in url_unescape() function. It is disabled for now, but we need it sooner or later.
@@ -122,3 +124,5 @@ Merge to CI of Netsurf.
 ===FIXED=== Add support for multipart/form-data POST requests.
 
 Add custom pages for 404 or 5xx errors like what "regular browsers" show. Designers! *Looks at Leency*
+
+Fix pixel-to-colour alpha blending in plotter for 32xbgr.
