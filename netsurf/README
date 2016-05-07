@@ -65,64 +65,67 @@ Have FUN!
 ISSUES
 ====
 
-Slow Page loading times.
 
-===FIXED=== Handle Headers , especially cookies to handle maintaining sessions. Right now it'll just keep kicking you out if you try to log onto a site.
+[s] Handle Headers , especially cookies to handle maintaining sessions. Right now it'll just keep kicking you out if you try to log onto a site.[/s]
 
-===FIXED=== Colours are messed up right now, somehow the RED component is missing. Probably something wrong in the pixel layout in memory.
+[s] Colours are messed up right now, somehow the RED component is missing. Probably something wrong in the pixel layout in memory.[/s]
 
-CSS Does not always load pretty graphics for the same website (For example board.kolibrios.org).
+[s] Properly handle all return codes. We just abort fetch if http code is not 200 or 3xx.[/s]
 
-===FIXED=== Properly handle all return codes. We just abort fetch if http code is not 200 or 3xx.
+[s] Crash with imgur.com[/s]
 
-===FIXED=== Crash with imgur.com
-
-Handle netsurf command line handling arguments
-
-===FIXED=== Remove hard coded paths about /usbhd0/1/ so that the binary can run from anywhere.
-	    We just need to place res/ in the same directory as netsurf executable now.
+[s] Remove hard coded paths about /usbhd0/1/ so that the binary can run from anywhere.[/s]
+[s]	    We just need to place res/ in the same directory as netsurf executable now.[/s]
 	    
-No HTTPS (Half of the world uses it....Damn PolarSSL..)
+[s]No image support yet.[/s]
+[S]No JPEG Support.[/S]
+[S]No GIF Support.[/S]
 
-Handle TAB key to cycle through fields.
+[s]Entry boxes do not load.[/s]
+[s]board.kolibrios.org crashes after some time.[/s]
 
-Polish and Finish kolibri surface for libnsfb.
+[s]No POST yet. Only GET.[/s]
 
-===FIXED=== No image support yet. We have PNG!
+[s]free() crashes for favicon string in url_unescape() function. It is disabled for now, but we need it sooner or later.[/s]
+[s]Port libiconv [/s]
 
-JPEG Support.
-GIF Support.
+[s]Fix crash related to loading wiki.osdev.org (and other websites with PNGs)[/s]
 
-No Javascript.
+[s]Add support for multipart/form-data POST requests.[/s]
 
-===FIXED=== Entry boxes do not load.
-===FIXED=== board.kolibrios.org crashes after some time.
-
-Might crash randomly because of some malloc/free issues after an HTTP POST.
-
-===FIXED=== No POST yet. Only GET.
-
-No FileSystem caching yet. Need to enable FS Backing Store.
-Caching is disabled , especially If-modified-since and if-none-match headers.
-The caching can be enabled later when everything else is Working 100%.
-
-==FIXED== free() crashes for favicon string in url_unescape() function. It is disabled for now, but we need it sooner or later.
-There are too many debug statements around the code (including libs), remove them.
-
-Downloads probably won't work right now [ Untested, but best guessed ]
-
-==FIXED== Port libiconv 
+===================================================================================================
 
 Upload libiconv port to SVN. Make size smaller. Strip useless crap from the big source code before it.
 
 Stop feeding HTTP Header line to core.
 
-===FIXED=== Fix crash related to loading wiki.osdev.org (and other websites with PNGs)
+Add custom pages for 404 or 5xx errors like what "regular browsers" show. Designers! *Looks at Leency*
+
+Fix pixel-to-colour alpha blending in plotter for 32xbgr. 
+
+No HTTPS (Half of the world uses it....Damn PolarSSL..)
+
+Handle TAB key to cycle through fields.
+Handle arrow keys to move in the title bar.
+
+Polish and Finish kolibri surface for libnsfb.
 
 Merge to CI of Netsurf.
 
-===FIXED=== Add support for multipart/form-data POST requests.
+There are too many debug statements around the code (including libs), remove them.
 
-Add custom pages for 404 or 5xx errors like what "regular browsers" show. Designers! *Looks at Leency*
+Downloads probably won't work right now [ Untested, but best guessed ]
 
-Fix pixel-to-colour alpha blending in plotter for 32xbgr.
+Slow Page loading times.
+
+CSS Does not always load pretty graphics for the same website (For example board.kolibrios.org).
+
+Handle netsurf command line handling arguments
+
+No FileSystem caching yet. Need to enable FS Backing Store.
+Caching is disabled , especially If-modified-since and if-none-match headers.
+The caching can be enabled later when everything else is Working 100%.
+
+Might crash randomly because of some malloc/free issues after an HTTP POST.
+
+No Javascript.
