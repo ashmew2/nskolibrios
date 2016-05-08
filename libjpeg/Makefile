@@ -1,45 +1,30 @@
-# Makefile for Independent JPEG Group's software
+# Makefile created by ashmew2 with motivation from libpng Makefile.
+# Build with make in this directory.
 
-# This makefile is suitable for Unix-like systems with non-ANSI compilers.
-# If you have an ANSI compiler, makefile.ansi is a better starting point.
-
-# Read installation instructions before saying "make" !!
+LIBRARY= libjpeg
 
 # The name of your C compiler:
-CC= cc
+CC = kos32-gcc
+AR = kos32-ar
+LD = kos32-ld
+STRIP = kos32-strip
 
-# You may need to adjust these cc options:
-CFLAGS= -O
-# Generally, we recommend defining any configuration symbols in jconfig.h,
-# NOT via -D switches here.
-# However, any special defines for ansi2knr.c may be included here:
-ANSI2KNRFLAGS= 
+CFLAGS = -UWIN32 -UWindows -U_WINDOWS -U_WIN32 -U__WIN32__ -c -O2 -fno-ident -fomit-frame-pointer
 
-# Link-time cc options:
-LDFLAGS= 
+LDFLAGS= -shared -s -nostdlib -T ../newlib/dll.lds --entry _DllStartup --image-base=0
+LDFLAGS+=  --out-implib $(LIBRARY).dll.a
 
-# To link any special libraries, add the necessary -l commands here.
-LDLIBS= 
+ARFLAGS:= crs
 
-# Put here the object file name for the correct system-dependent memory
-# manager file.  For Unix this is usually jmemnobs.o, but you may want
-# to use jmemansi.o or jmemname.o if you have limited swap space.
+INCLUDES= -I. -I../newlib/libc/include -I../zlib
+
+LIBPATH:= -L/home/autobuild/tools/win32/lib
+
+LIBS:=  -ldll -lc.dll -lz.dll
+
+DEFS = -DHAVE_CONFIG_H
+
 SYSDEPMEM= jmemnobs.o
-
-# miscellaneous OS-dependent stuff
-# linker
-LN= $(CC)
-# file deletion command
-RM= rm -f
-# file rename command
-MV= mv
-# library (.a) file creation command
-AR= ar rc
-# second step in .a creation (use "touch" if not needed)
-AR2= ranlib
-
-# End of configurable options.
-
 
 # source files: JPEG library proper
 LIBSOURCES= jcapimin.c jcapistd.c jccoefct.c jccolor.c jcdctmgr.c jchuff.c \
@@ -50,112 +35,43 @@ LIBSOURCES= jcapimin.c jcapistd.c jccoefct.c jccolor.c jcdctmgr.c jchuff.c \
         jdpostct.c jdsample.c jdtrans.c jerror.c jfdctflt.c jfdctfst.c \
         jfdctint.c jidctflt.c jidctfst.c jidctint.c jidctred.c jquant1.c \
         jquant2.c jutils.c jmemmgr.c
-# memmgr back ends: compile only one of these into a working library
-SYSDEPSOURCES= jmemansi.c jmemname.c jmemnobs.c jmemdos.c jmemmac.c
-# source files: cjpeg/djpeg/jpegtran applications, also rdjpgcom/wrjpgcom
-APPSOURCES= cjpeg.c djpeg.c jpegtran.c rdjpgcom.c wrjpgcom.c cdjpeg.c \
-        rdcolmap.c rdswitch.c transupp.c rdppm.c wrppm.c rdgif.c wrgif.c \
-        rdtarga.c wrtarga.c rdbmp.c wrbmp.c rdrle.c wrrle.c
-SOURCES= $(LIBSOURCES) $(SYSDEPSOURCES) $(APPSOURCES)
-# files included by source files
-INCLUDES= jchuff.h jdhuff.h jdct.h jerror.h jinclude.h jmemsys.h jmorecfg.h \
-        jpegint.h jpeglib.h jversion.h cdjpeg.h cderror.h transupp.h
-# documentation, test, and support files
-DOCS= README install.doc usage.doc cjpeg.1 djpeg.1 jpegtran.1 rdjpgcom.1 \
-        wrjpgcom.1 wizard.doc example.c libjpeg.doc structure.doc \
-        coderules.doc filelist.doc change.log
-MKFILES= configure makefile.cfg makefile.ansi makefile.unix makefile.bcc \
-        makefile.mc6 makefile.dj makefile.wat makefile.vc makelib.ds \
-        makeapps.ds makeproj.mac makcjpeg.st makdjpeg.st makljpeg.st \
-        maktjpeg.st makefile.manx makefile.sas makefile.mms makefile.vms \
-        makvms.opt
-CONFIGFILES= jconfig.cfg jconfig.bcc jconfig.mc6 jconfig.dj jconfig.wat \
-        jconfig.vc jconfig.mac jconfig.st jconfig.manx jconfig.sas \
-        jconfig.vms
-CONFIGUREFILES= config.guess config.sub install-sh ltconfig ltmain.sh
-OTHERFILES= jconfig.doc ckconfig.c ansi2knr.c ansi2knr.1 jmemdosa.asm
-TESTFILES= testorig.jpg testimg.ppm testimg.bmp testimg.jpg testprog.jpg \
-        testimgp.jpg
-DISTFILES= $(DOCS) $(MKFILES) $(CONFIGFILES) $(SOURCES) $(INCLUDES) \
-        $(CONFIGUREFILES) $(OTHERFILES) $(TESTFILES)
+
 # library object files common to compression and decompression
 COMOBJECTS= jcomapi.o jutils.o jerror.o jmemmgr.o $(SYSDEPMEM)
+
 # compression library object files
 CLIBOBJECTS= jcapimin.o jcapistd.o jctrans.o jcparam.o jdatadst.o jcinit.o \
         jcmaster.o jcmarker.o jcmainct.o jcprepct.o jccoefct.o jccolor.o \
         jcsample.o jchuff.o jcphuff.o jcdctmgr.o jfdctfst.o jfdctflt.o \
         jfdctint.o
+
 # decompression library object files
 DLIBOBJECTS= jdapimin.o jdapistd.o jdtrans.o jdatasrc.o jdmaster.o \
         jdinput.o jdmarker.o jdhuff.o jdphuff.o jdmainct.o jdcoefct.o \
         jdpostct.o jddctmgr.o jidctfst.o jidctflt.o jidctint.o jidctred.o \
         jdsample.o jdcolor.o jquant1.o jquant2.o jdmerge.o
+
 # These objectfiles are included in libjpeg.a
 LIBOBJECTS= $(CLIBOBJECTS) $(DLIBOBJECTS) $(COMOBJECTS)
-# object files for sample applications (excluding library files)
-COBJECTS= cjpeg.o rdppm.o rdgif.o rdtarga.o rdrle.o rdbmp.o rdswitch.o \
-        cdjpeg.o
-DOBJECTS= djpeg.o wrppm.o wrgif.o wrtarga.o wrrle.o wrbmp.o rdcolmap.o \
-        cdjpeg.o
-TROBJECTS= jpegtran.o rdswitch.o cdjpeg.o transupp.o
 
+all: $(LIBRARY).a $(LIBRARY).dll
 
-all: ansi2knr libjpeg.a cjpeg djpeg jpegtran rdjpgcom wrjpgcom
+$(LIBRARY).a: $(LIBOBJECTS) Makefile
+	$(AR) $(ARFLAGS) $(LIBRARY).a $(LIBOBJECTS)
+	mv -f $(LIBRARY).a ../../lib
 
-# This rule causes ansi2knr to be invoked.
-.c.o:
-	./ansi2knr $*.c T$*.c
-	$(CC) $(CFLAGS) -c T$*.c
-	$(RM) T$*.c $*.o
-	$(MV) T$*.o $*.o
+$(LIBRARY).dll: $(LIBOBJECTS) Makefile
+	$(LD) $(LDFLAGS) $(LIBPATH) -o $@ $(LIBOBJECTS) $(LIBS)
+	$(STRIP) $@
+	mv -f $@ ../../bin
+	mv -f $(LIBRARY).dll.a ../../lib   
 
-ansi2knr: ansi2knr.c
-	$(CC) $(CFLAGS) $(ANSI2KNRFLAGS) -o ansi2knr ansi2knr.c
+%.o : %.c Makefile
+	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
 
-libjpeg.a: ansi2knr $(LIBOBJECTS)
-	$(RM) libjpeg.a
-	$(AR) libjpeg.a  $(LIBOBJECTS)
-	$(AR2) libjpeg.a
-
-cjpeg: ansi2knr $(COBJECTS) libjpeg.a
-	$(LN) $(LDFLAGS) -o cjpeg $(COBJECTS) libjpeg.a $(LDLIBS)
-
-djpeg: ansi2knr $(DOBJECTS) libjpeg.a
-	$(LN) $(LDFLAGS) -o djpeg $(DOBJECTS) libjpeg.a $(LDLIBS)
-
-jpegtran: ansi2knr $(TROBJECTS) libjpeg.a
-	$(LN) $(LDFLAGS) -o jpegtran $(TROBJECTS) libjpeg.a $(LDLIBS)
-
-rdjpgcom: rdjpgcom.o
-	$(LN) $(LDFLAGS) -o rdjpgcom rdjpgcom.o $(LDLIBS)
-
-wrjpgcom: wrjpgcom.o
-	$(LN) $(LDFLAGS) -o wrjpgcom wrjpgcom.o $(LDLIBS)
-
-jconfig.h: jconfig.doc
-	echo You must prepare a system-dependent jconfig.h file.
-	echo Please read the installation directions in install.doc.
-	exit 1
-
-clean:
-	$(RM) *.o cjpeg djpeg jpegtran libjpeg.a rdjpgcom wrjpgcom
-	$(RM) ansi2knr core testout*
-
-test: cjpeg djpeg jpegtran
-	$(RM) testout*
-	./djpeg -dct int -ppm -outfile testout.ppm  testorig.jpg
-	./djpeg -dct int -bmp -colors 256 -outfile testout.bmp  testorig.jpg
-	./cjpeg -dct int -outfile testout.jpg  testimg.ppm
-	./djpeg -dct int -ppm -outfile testoutp.ppm testprog.jpg
-	./cjpeg -dct int -progressive -opt -outfile testoutp.jpg testimg.ppm
-	./jpegtran -outfile testoutt.jpg testprog.jpg
-	cmp testimg.ppm testout.ppm
-	cmp testimg.bmp testout.bmp
-	cmp testimg.jpg testout.jpg
-	cmp testimg.ppm testoutp.ppm
-	cmp testimgp.jpg testoutp.jpg
-	cmp testorig.jpg testoutt.jpg
-
+clean : 
+	rm -rf *.o
+	rm -rf *.a
 
 jcapimin.o: jcapimin.c jinclude.h jconfig.h jpeglib.h jmorecfg.h jpegint.h jerror.h
 jcapistd.o: jcapistd.c jinclude.h jconfig.h jpeglib.h jmorecfg.h jpegint.h jerror.h
