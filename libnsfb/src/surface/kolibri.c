@@ -36,14 +36,20 @@ unsigned previous_mouse_position, previous_mouse_buttons;
 
 int kolibri_get_button_id(void) {
     uint16_t __ret;
-    __asm__ __volatile__("int $0x40":"=a"(__ret):"0"(17));
-    if((__ret & 0xFF)==0) return (__ret>>8)&0xFF; else return -1;
+    __asm__ __volatile__ ("int $0x40"
+			  :"=a"(__ret)
+			  :"0"(17));
+
+    if((__ret & 0xFF)==0) 
+      return (__ret>>8)&0xFF; 
+    else 
+      return -1;
 }
 
 int kolibri_wait_for_event(void) {
-    uint32_t __ret;
-    __asm__ __volatile__("int $0x40":"=a"(__ret):"0"(10));
-    return __ret;
+  uint32_t __ret;
+  __asm__ __volatile__("int $0x40":"=a"(__ret):"0"(10));
+  return __ret;
 }
 
 int kolibri_get_pressed_key(void) {
