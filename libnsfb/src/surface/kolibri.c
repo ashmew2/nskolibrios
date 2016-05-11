@@ -138,7 +138,9 @@ unsigned kolibri_area(char *data) {
 void kolibri_window_redraw(nsfb_t *nsfb){
 
     kolibri_window_redraw(1);
-    kolibri_define_window(100,100,nsfb->width+9,nsfb->height+kolibri_skin_get_height(),0x34000080,0x800000FF,"Netsurf for KolibriOS");
+    /* Leency suggested using 0x74000080 instead of 0x34000080. Here we go,.. */
+    /* kolibri_define_window(100,100,nsfb->width+9,nsfb->height+kolibri_skin_get_height(),0x34000080,0x800000FF,"Netsurf for KolibriOS"); */
+    kolibri_define_window(100,100,nsfb->width+9,nsfb->height+kolibri_skin_get_height(),0x74000080,0x800000FF,"Netsurf for KolibriOS");
     //__menuet__write_text(3,3,0xFFFFFF,"Netsurf",7);
     debug_board_write_str("f65 is mighty with 32 bpp!\n");
 
