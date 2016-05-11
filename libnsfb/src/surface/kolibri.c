@@ -392,7 +392,7 @@ static bool kolibri_surface_input(nsfb_t *nsfb, nsfb_event_t *event,
 
 		if (previous_mouse_position != z) {
 			event->type = NSFB_EVENT_MOVE_ABSOLUTE;
-			event->value.vector.x = (z & 0xffff0000)>>16;
+			event->value.vector.x = (z & 0xffff0000) >> 16;
 			event->value.vector.y = z & 0xffff;
 			event->value.vector.z = 0;
 			previous_mouse_position = z;
@@ -461,7 +461,7 @@ static bool kolibri_surface_input(nsfb_t *nsfb, nsfb_event_t *event,
 
 			if(vert != 0) {
 				/*Handle vertical scroll*/
-				if(vert>0) /*SCROLL DOWN*/
+				if(vert > 0) /*SCROLL DOWN*/
 					event->value.keycode = NSFB_KEY_MOUSE_5;
 				else /*SCROLL UP*/
 					event->value.keycode = NSFB_KEY_MOUSE_4;
