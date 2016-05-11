@@ -34,7 +34,8 @@
 unsigned char * pixels;
 unsigned previous_mouse_position, previous_mouse_buttons;
 
-int kolibri_get_button_id(void) {
+int kolibri_get_button_id(void)
+{
 	uint16_t __ret;
 	__asm__ __volatile__ (
 		"int $0x40"
@@ -47,13 +48,15 @@ int kolibri_get_button_id(void) {
 		return -1;
 }
 
-int kolibri_wait_for_event(void) {
+int kolibri_wait_for_event(void)
+{
 	uint32_t __ret;
 	__asm__ __volatile__("int $0x40":"=a"(__ret):"0"(10));
 	return __ret;
 }
 
-int kolibri_get_pressed_key(void) {
+int kolibri_get_pressed_key(void)
+{
 	uint16_t __ret;
 	__asm__ __volatile__("int $0x40":"=a"(__ret):"0"(2));
 
@@ -65,7 +68,8 @@ int kolibri_get_pressed_key(void) {
 
 void kolibri_define_window(uint16_t x1, uint16_t y1, uint16_t xsize,
 		uint16_t ysize, uint32_t body_color, uint32_t grab_color,
-		uint32_t frame_color) {
+		uint32_t frame_color)
+{
 	uint32_t a, b;
 	a=(x1 << 16)|xsize;
 	b=(y1 << 16)|ysize;
@@ -79,15 +83,18 @@ void kolibri_define_window(uint16_t x1, uint16_t y1, uint16_t xsize,
 		"D"(frame_color));
 }
 
-void kolibri_window_redraw(int status) {
+void kolibri_window_redraw(int status)
+{
 	__asm__ __volatile__("int $0x40"::"a"(12),"b"(status));
 }
 
-void kolibri_set_wanted_events(uint32_t ev) {
+void kolibri_set_wanted_events(uint32_t ev)
+{
 	__asm__ __volatile__ ("int $0x40"::"a"(40),"b"(ev));
 }
 
-inline void f65_32bpp(unsigned x, unsigned y, unsigned w, unsigned h, char *d) {
+inline void f65_32bpp(unsigned x, unsigned y, unsigned w, unsigned h, char *d)
+{
 	__asm__ __volatile__ ("pusha");
 	__asm__ __volatile__ ("nop"::"D"(0), "c"(w*65536 + h), "d"(x*65536 + y),
 		"b"(d));
@@ -99,49 +106,57 @@ inline void f65_32bpp(unsigned x, unsigned y, unsigned w, unsigned h, char *d) {
 	__asm__ __volatile__ ("popa");
 }
 
-unsigned kolibri_mouse_get_relative(void) {
+unsigned kolibri_mouse_get_relative(void)
+{
 	unsigned error;
 	__asm__ __volatile__ ("int $0x40":"=a"(error):"a"(37), "b"(1));
 	return error;
 }
 
 
-unsigned kolibri_mouse_get_buttonpress(void) {
+unsigned kolibri_mouse_get_buttonpress(void)
+{
 	unsigned error;
 	__asm__ __volatile__ ("int $0x40":"=a"(error):"a"(37), "b"(2));
 	return error;
 }
 
-unsigned kolibri_mouse_get_scrolldata(void) {
+unsigned kolibri_mouse_get_scrolldata(void)
+{
 	unsigned error;
 	__asm__ __volatile__ ("int $0x40":"=a"(error):"a"(37), "b"(7));
 	return error;
 }
 
 /* timeout is in 1/100 seconds */
-unsigned kolibri_wait_for_event_with_timeout(int timeout) {
+unsigned kolibri_wait_for_event_with_timeout(int timeout)
+{
 	unsigned event;
 	__asm__ __volatile__ ("int $0x40":"=a"(event):"a"(23), "b"(timeout));
 	return event;
 }
 
-unsigned kolibri_scancodes(void) {
+unsigned kolibri_scancodes(void)
+{
 	unsigned error;
 	__asm__ __volatile__ ("int $0x40":"=a"(error):"a"(66), "b"(1), "c"(1));
 	return error;
 }
 
-void kolibri_redraw(nsfb_t *nsfb) {
+void kolibri_redraw(nsfb_t *nsfb)
+{
 	f65_32bpp(0, 0, nsfb->width, nsfb->height, pixels + 1);
 }
 
-unsigned kolibri_skin_get_height(void) {
+unsigned kolibri_skin_get_height(void)
+{
 	unsigned error;
 	__asm__ __volatile__ ("int $0x40":"=a"(error):"a"(48), "b"(4));
 	return error;
 }
 
-unsigned kolibri_area(char *data) {
+unsigned kolibri_area(char *data)
+{
 	unsigned error;
 	__asm__ __volatile__ ("int $0x40":"=a"(error):"a"(9), "b"(data),
 		"c"(0xffffffff));
@@ -149,7 +164,8 @@ unsigned kolibri_area(char *data) {
 }
 
 
-void kolibri_fb_redraw(nsfb_t *nsfb) {
+void kolibri_fb_redraw(nsfb_t *nsfb)
+{
 
 	kolibri_window_redraw(1);
 	kolibri_define_window(100, 100, nsfb->width + 9,
@@ -164,7 +180,8 @@ void kolibri_fb_redraw(nsfb_t *nsfb) {
 }
 
 static int kolibri_surface_set_geometry(nsfb_t *nsfb, int width, int height,
-		enum nsfb_format_e format) {
+		enum nsfb_format_e format)
+{
 
 	/* fail if surface already initialised */
 	if (nsfb->surface_priv != NULL)
@@ -187,7 +204,8 @@ static int kolibri_surface_set_geometry(nsfb_t *nsfb, int width, int height,
 	return 0;
 }
 
-static int kolibri_surface_initialise(nsfb_t *nsfb) {
+static int kolibri_surface_initialise(nsfb_t *nsfb)
+{
 	enum nsfb_format_e fmt;
 
 	kolibri_scancodes();
@@ -221,18 +239,21 @@ static int kolibri_surface_initialise(nsfb_t *nsfb) {
 	return 0;
 }
 
-static int kolibri_surface_finalise(nsfb_t *nsfb) {
+static int kolibri_surface_finalise(nsfb_t *nsfb)
+{
 	nsfb = nsfb;
 	exit(1);
 
 	return 0;
 }
 
-int key_is_up(int scancode) {
+int key_is_up(int scancode)
+{
 	return (scancode & 0x80) >> 7;
 }
 
-int scan2key(int scan) {
+int scan2key(int scan)
+{
 
 	int keycode = scan & 0x0FF7F;
 
@@ -322,12 +343,14 @@ int scan2key(int scan) {
 }
 
 /* TODO: Useful for future implementation */
-int ispowerkey(int scancode) {
+int ispowerkey(int scancode)
+{
 	return (scancode & 0xE000) >> 15;
 }
 
 static bool kolibri_surface_input(nsfb_t *nsfb, nsfb_event_t *event,
-		int timeout) {
+		int timeout)
+{
 	int got_event;
 	static int scanfull = 0;
 	char event_num[20];
@@ -474,7 +497,8 @@ static bool kolibri_surface_input(nsfb_t *nsfb, nsfb_event_t *event,
 	}
 }
 
-static int kolibri_surface_claim(nsfb_t *nsfb, nsfb_bbox_t *box) {
+static int kolibri_surface_claim(nsfb_t *nsfb, nsfb_bbox_t *box)
+{
 	/* TODO: Convert to full function from stub  */
 
 	/*
@@ -488,12 +512,14 @@ static int kolibri_surface_claim(nsfb_t *nsfb, nsfb_bbox_t *box) {
 	return 0;
 }
 
-static int kolibri_surface_cursor(nsfb_t *nsfb, struct nsfb_cursor_s *cursor) {
+static int kolibri_surface_cursor(nsfb_t *nsfb, struct nsfb_cursor_s *cursor)
+{
 	/* Convert to full function from stub  */
 	return true;
 }
 
-static int kolibri_surface_update(nsfb_t *nsfb, nsfb_bbox_t *box) {
+static int kolibri_surface_update(nsfb_t *nsfb, nsfb_bbox_t *box)
+{
 	/* Do the window redraw here */
 	kolibri_redraw(nsfb);
 	return 0;
