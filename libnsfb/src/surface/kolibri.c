@@ -99,20 +99,20 @@ inline void f65_32bpp(unsigned x, unsigned y, unsigned w, unsigned h, char *d) {
 	__asm__ __volatile__ ("popa");
 }
 
-unsigned kolibri_mouse_get_relative() {
+unsigned kolibri_mouse_get_relative(void) {
 	unsigned error;
 	__asm__ __volatile__ ("int $0x40":"=a"(error):"a"(37), "b"(1));
 	return error;
 }
 
 
-unsigned kolibri_mouse_get_buttonpress() {
+unsigned kolibri_mouse_get_buttonpress(void) {
 	unsigned error;
 	__asm__ __volatile__ ("int $0x40":"=a"(error):"a"(37), "b"(2));
 	return error;
 }
 
-unsigned kolibri_mouse_get_scrolldata() {
+unsigned kolibri_mouse_get_scrolldata(void) {
 	unsigned error;
 	__asm__ __volatile__ ("int $0x40":"=a"(error):"a"(37), "b"(7));
 	return error;
@@ -125,7 +125,7 @@ unsigned kolibri_wait_for_event_with_timeout(int timeout) {
 	return event;
 }
 
-unsigned kolibri_scancodes() {
+unsigned kolibri_scancodes(void) {
 	unsigned error;
 	__asm__ __volatile__ ("int $0x40":"=a"(error):"a"(66), "b"(1), "c"(1));
 	return error;
@@ -135,7 +135,7 @@ void kolibri_redraw(nsfb_t *nsfb) {
 	f65_32bpp(0, 0, nsfb->width, nsfb->height, pixels + 1);
 }
 
-unsigned kolibri_skin_get_height() {
+unsigned kolibri_skin_get_height(void) {
 	unsigned error;
 	__asm__ __volatile__ ("int $0x40":"=a"(error):"a"(48), "b"(4));
 	return error;
@@ -158,7 +158,7 @@ void kolibri_fb_redraw(nsfb_t *nsfb) {
 
 	debug_board_write_str("f65 is mighty with 32 bpp!\n");
 
-	//here put image pixels! it's 32bpp
+	/* Here put image pixels! it's 32bpp */
 	f65_32bpp(0, 0, nsfb->width, nsfb->height, pixels + 1);
 	kolibri_window_redraw(2);
 }
@@ -335,7 +335,7 @@ static bool kolibri_surface_input(nsfb_t *nsfb, nsfb_event_t *event,
 	nsfb = nsfb; /* unused */
 
 	if (timeout >= 0) {
-		got_event = kolibri_wait_for_event_with_timeout(timeout/10);
+		got_event = kolibri_wait_for_event_with_timeout(timeout / 10);
 	} else {
 		got_event = kolibri_wait_for_event();
 	}
@@ -364,7 +364,7 @@ static bool kolibri_surface_input(nsfb_t *nsfb, nsfb_event_t *event,
 			scanfull = scanfull + scanz;
 	}
 
-	if (key_is_up(scanfull)==1) {
+	if (key_is_up(scanfull) == 1) {
 		event->type = NSFB_EVENT_KEY_UP;
 	} else {
 		event->type = NSFB_EVENT_KEY_DOWN;
@@ -379,7 +379,7 @@ static bool kolibri_surface_input(nsfb_t *nsfb, nsfb_event_t *event,
 
 	/* button press event */
 	if (got_event == 3) {
-		if (kolibri_get_button_id()==1)
+		if (kolibri_get_button_id() == 1)
 			 kolibri_surface_finalise(nsfb);
 		return true;
 	}
