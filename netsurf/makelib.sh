@@ -1,4 +1,4 @@
-if [ "$1" -eq "" ]; then
+if [ "$1" == "" ]; then
 	exit
 fi
 
