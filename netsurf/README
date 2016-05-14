@@ -5,35 +5,42 @@ This is a work under progress.
 
 If you have an executable, you can skip to the "Running the binary on KolibriOS" section below.
 -----------------------------------------------------------------------------------------------
-
-In order to compile this, you need to first build all libraries using the maker.sh script on your machine.
-Once that is done, You need to build netsurf with the builder.sh script.
+You need multiple libraries for compiling netsurf successfully.
+Read the next section for more information or check github.com/ashmew2/nskolibrios.
 
 PREREQUISITES FOR COMPILING
 ---------------------------
 kos32-gcc Compiler is set up at /home/autobuild/tools/win32/bin/kos32-gcc
-
 Set up your path to contain /home/autobuild/tools/win32/bin/
-
 Kolibrios SVN sources are at $HOME/kolibrios
 
-maker.sh is the build script for Building Netsurf required libraries.
+Required libraries:
 
-zlib has been compiled from contrib/sdk/sources/zlib and the libz.a file placed at /home/autobuild/tools/win32/lib
+libpng
+libjpeg
+zlib
+libapp
+libc
+libiberty
+Other libraries (Check repository for all of them).
 
-libc.dll.a and libapp.a and libiberty.a have been compiled from $HOME/kolibrios/contrib/sdk/sources/newlib/libc and copied to /home/autobuild/tools/win32/lib
+Libraries should be compiled to .a files and placed at /home/autobuild/tools/win32/lib OR inst directory
+(Check the Makefile.target inside kolibrios directory)
 
-After that: Simply run builder.sh from this directory. It will compile your stuff.
+After all libraries are set up, you can execute :
+
+make TARGET=kolibrios
+
+nskolibrios is your executable.
+
 ----------------------------------------------------------------------------------
 
 Running the binary on KolibriOS
 ===============================
 
-Copy the executable nsbin into a directory.
-
 Set up the kolibrios/ directory as this is required for running libc applications like Netsurf.
 
-You also need boxlib and http obj libraries at least (These are part of standard installation, so I don't think it needs any setup).
+You also need boxlib and http obj libraries at least (No additional setup required..)
 
 CleverMouse said "You have probably not configured the folder /kolibrios. In order to do 
 this, copy the folder /kolibrios and the file kolibri.lbl from the 
@@ -43,9 +50,9 @@ KolibriOS, so that /hdX/Y/kolibri.lbl and /hdX/Y/kolibrios/, or
 KolibriOS. And yes, this is a sacred knowledge not present in the 
 documentation." - http://board.kolibrios.org/viewtopic.php?f=23&t=2865&p=58495&hilit=.lbl#p58495
 
-
-Once you have set up these directories, you can execute KolibriOS and 
-run the nsbin executable.
+Extract the _netsurf.zip file into a directory that KolibriOS will use.
+Make sure nskolibrios (executable) and res/ directory are in the same location.
+Execute nskolibrios executable.
 
 I usually use this as the command to run my qemu instance of Kolibri:
 
@@ -92,6 +99,7 @@ ISSUES
 [s]Fix crash related to loading wiki.osdev.org (and other websites with PNGs)[/s]
 
 [s]Add support for multipart/form-data POST requests.[/s]
+[s]Polish and Finish kolibri surface for libnsfb.[/s]
 
 ===================================================================================================
 
@@ -108,13 +116,13 @@ No HTTPS (Half of the world uses it....Damn PolarSSL..)
 Handle TAB key to cycle through fields.
 Handle arrow keys to move in the title bar.
 
-Polish and Finish kolibri surface for libnsfb.
-
 Merge to CI of Netsurf.
 
 There are too many debug statements around the code (including libs), remove them.
 
 Downloads probably won't work right now [ Untested, but best guessed ]
+
+Merge libnsfb surface to Netsurf official repo.
 
 Slow Page loading times.
 
