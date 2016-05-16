@@ -22,13 +22,16 @@
 #include "cursor.h"
 
 /* Define codes for KolibriOS' events  */
-#define EVENT_REDRAW              0x00000001
-#define EVENT_KEY                 0x00000002
-#define EVENT_BUTTON              0x00000004
-#define EVENT_END_REQUEST         0x00000008
-#define EVENT_DESKTOP_BACK_DRAW   0x00000010
-#define EVENT_MOUSE_CHANGE        0x00000020
-#define EVENT_IPC		  0x00000040
+#define EVENT_REDRAW              (1 << 0)
+#define EVENT_KEY                 (1 << 1)
+#define EVENT_BUTTON              (1 << 2)
+#define EVENT_END_REQUEST         (1 << 3)
+#define EVENT_DESKTOP_BACK_DRAW   (1 << 4)
+#define EVENT_MOUSE_CHANGE        (1 << 5)
+#define EVENT_IPC                 (1 << 6)
+#define EVENT_NETWORK             (1 << 7)
+#define EVENT_INACTIVE_NO_CURSOR  (1 << 30)
+#define EVENT_INACTIVE_NO_MOUSE   (1 << 31)
 
 /* Pixel array which we need to pass around. */
 unsigned char * pixels;
@@ -42,28 +45,32 @@ int kolibri_get_button_id(void)
 		:"=a"(__ret)
 		:"0"(17));
 
-	if((__ret & 0xFF) == 0)
+	if ((__ret & 0xFF) == 0) {
 		return (__ret >> 8) & 0xFF;
-	else
+	}
+	else {
 		return -1;
+	}
 }
 
 int kolibri_wait_for_event(void)
 {
 	uint32_t __ret;
-	__asm__ __volatile__("int $0x40":"=a"(__ret):"0"(10));
+	__asm__ __volatile__ ("int $0x40":"=a"(__ret):"0"(10));
 	return __ret;
 }
 
 int kolibri_get_pressed_key(void)
 {
 	uint16_t __ret;
-	__asm__ __volatile__("int $0x40":"=a"(__ret):"0"(2));
+	__asm__ __volatile__ ("int $0x40":"=a"(__ret):"0"(2));
 
-	if(!(__ret & 0xFF))
+	if (!(__ret & 0xFF)) {
 		return (__ret >> 8) & 0xFF;
-	else
+	}
+	else {
 		return 0;
+	}
 }
 
 void kolibri_define_window(uint16_t x1, uint16_t y1, uint16_t xsize,
@@ -71,10 +78,10 @@ void kolibri_define_window(uint16_t x1, uint16_t y1, uint16_t xsize,
 		uint32_t frame_color)
 {
 	uint32_t a, b;
-	a=(x1 << 16)|xsize;
-	b=(y1 << 16)|ysize;
+	a = (x1 << 16) | xsize;
+	b = (y1 << 16) | ysize;
 
-	__asm__ __volatile__("int $0x40"
+	__asm__ __volatile__ ("int $0x40"
 		::"a"(0),
 		"b"(a),
 		"c"(b),
@@ -85,7 +92,7 @@ void kolibri_define_window(uint16_t x1, uint16_t y1, uint16_t xsize,
 
 void kolibri_window_redraw(int status)
 {
-	__asm__ __volatile__("int $0x40"::"a"(12),"b"(status));
+	__asm__ __volatile__ ("int $0x40"::"a"(12),"b"(status));
 }
 
 void kolibri_set_wanted_events(uint32_t ev)
@@ -166,7 +173,6 @@ unsigned kolibri_area(char *data)
 
 void kolibri_fb_redraw(nsfb_t *nsfb)
 {
-
 	kolibri_window_redraw(1);
 	kolibri_define_window(100, 100, nsfb->width + 9,
 		nsfb->height + kolibri_skin_get_height(), 0x74000080,
@@ -194,12 +200,13 @@ static int kolibri_surface_set_geometry(nsfb_t *nsfb, int width, int height,
 	/* We add one more byte to balance XBGR to BGRX for KolibriOS. */
 	/* *4 because we only support 32bpp */
 
-	pixels = (char *)malloc(width*height*4 + 1);
+	pixels = (char *)malloc(width * height * 4 + 1);
 
 	/* select default sw plotters for format */
 	/* Fail if plotter selection fails */
-	if (select_plotters(nsfb) == false)
+	if (select_plotters(nsfb) == false) {
 		return -1;
+	}
 
 	return 0;
 }
@@ -229,12 +236,14 @@ static int kolibri_surface_initialise(nsfb_t *nsfb)
 	debug_board_write_str("Redraw\n");
 	kolibri_redraw(nsfb);
 
-	/*This is for setting flags for mcall40 for events read by a window*/
+	/* This is for setting flags for MCALL 40 for events read by a window */
 	kolibri_set_wanted_events(EVENT_REDRAW |
 		EVENT_KEY |
 		EVENT_BUTTON |
 		EVENT_MOUSE_CHANGE |
-		(1 << 30) | (1 << 31) | (1 << 7));
+		EVENT_INACTIVE_NO_CURSOR |
+		EVENT_INACTIVE_NO_MOUSE |
+		EVENT_NETWORK);
 
 	return 0;
 }
@@ -425,42 +434,42 @@ static bool kolibri_surface_input(nsfb_t *nsfb, nsfb_event_t *event,
 			/* All high bits in the XOR represent bits that
 			   changed */
 
-			if(diff&(1 << 0)) {
+			if (diff & EVENT_REDRAW) {
 				/* Left mouse button */
 				event->value.keycode = NSFB_KEY_MOUSE_1;
-				if(b & (1 << 0)) {
+				if (b & EVENT_REDRAW) {
 					event->type = NSFB_EVENT_KEY_DOWN;
 				} else {
 					event->type = NSFB_EVENT_KEY_UP;
 				}
-			} else if(diff & (1 << 1)) {
+			} else if (diff & EVENT_KEY) {
 				 /* Right mouse button */
 				event->value.keycode = NSFB_KEY_MOUSE_3;
-				if(b & (1 << 1)) {
+				if (b & EVENT_KEY) {
 					event->type = NSFB_EVENT_KEY_DOWN;
 				} else {
 					event->type = NSFB_EVENT_KEY_UP;
 				}
-			} else if(diff & (1 << 2)) {
+			} else if (diff & EVENT_BUTTON) {
 				/* Middle mouse button */
 				event->value.keycode = NSFB_KEY_MOUSE_2;
-				if(b&(1 << 2)) {
+				if (b & EVENT_BUTTON) {
 					event->type = NSFB_EVENT_KEY_DOWN;
 				} else {
 					event->type = NSFB_EVENT_KEY_UP;
 				}
-			} else if(diff & (1 << 3)) {
+			} else if (diff & EVENT_END_REQUEST) {
 				/* 4th mouse button (forward) */
 				event->value.keycode = NSFB_KEY_MOUSE_4;
-				if(b & (1 << 3)) {
+				if (b & EVENT_END_REQUEST) {
 					event->type = NSFB_EVENT_KEY_DOWN;
 				} else {
 					event->type = NSFB_EVENT_KEY_UP;
 				}
-			} else if(diff & (1 << 4)) {
+			} else if (diff & EVENT_DESKTOP_BACK_DRAW) {
 				/* 5th mouse button (back) */
 				event->value.keycode = NSFB_KEY_MOUSE_5;
-				if(b & (1 << 4)) {
+				if (b & EVENT_DESKTOP_BACK_DRAW) {
 					event->type = NSFB_EVENT_KEY_DOWN;
 				} else {
 					event->type = NSFB_EVENT_KEY_UP;
@@ -476,15 +485,15 @@ static bool kolibri_surface_input(nsfb_t *nsfb, nsfb_event_t *event,
 			}
 			previous_mouse_buttons = b;
 		}
-		else if(s != 0) {
+		else if (s != 0) {
 			short int vert = s & 0xffff;
 			short int hori = s >> 16;
 
 			event->type = NSFB_EVENT_KEY_DOWN;
 
-			if(vert != 0) {
+			if (vert != 0) {
 				/*Handle vertical scroll*/
-				if(vert > 0) /*SCROLL DOWN*/
+				if (vert > 0) /*SCROLL DOWN*/
 					event->value.keycode = NSFB_KEY_MOUSE_5;
 				else /*SCROLL UP*/
 					event->value.keycode = NSFB_KEY_MOUSE_4;
