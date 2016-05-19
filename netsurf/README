@@ -42,12 +42,12 @@ Set up the kolibrios/ directory as this is required for running libc application
 
 You also need boxlib and http obj libraries at least (No additional setup required..)
 
-CleverMouse said "You have probably not configured the folder /kolibrios. In order to do 
-this, copy the folder /kolibrios and the file kolibri.lbl from the 
-distribution kit to the root of some partition accessible from 
-KolibriOS, so that /hdX/Y/kolibri.lbl and /hdX/Y/kolibrios/, or 
-/usbhdX/Y/kolibri.lbl and /usbhdX/Y/kolibrios/ are accessible from 
-KolibriOS. And yes, this is a sacred knowledge not present in the 
+CleverMouse said "You have probably not configured the folder /kolibrios. In order to do
+this, copy the folder /kolibrios and the file kolibri.lbl from the
+distribution kit to the root of some partition accessible from
+KolibriOS, so that /hdX/Y/kolibri.lbl and /hdX/Y/kolibrios/, or
+/usbhdX/Y/kolibri.lbl and /usbhdX/Y/kolibrios/ are accessible from
+KolibriOS. And yes, this is a sacred knowledge not present in the
 documentation." - http://board.kolibrios.org/viewtopic.php?f=23&t=2865&p=58495&hilit=.lbl#p58495
 
 Extract the _netsurf.zip file into a directory that KolibriOS will use.
@@ -83,7 +83,7 @@ ISSUES
 
 [s] Remove hard coded paths about /usbhd0/1/ so that the binary can run from anywhere.[/s]
 [s]	    We just need to place res/ in the same directory as netsurf executable now.[/s]
-	    
+
 [s]No image support yet.[/s]
 [S]No JPEG Support.[/S]
 [S]No GIF Support.[/S]
@@ -109,7 +109,7 @@ Stop feeding HTTP Header line to core.
 
 Add custom pages for 404 or 5xx errors like what "regular browsers" show. Designers! *Looks at Leency*
 
-Fix pixel-to-colour alpha blending in plotter for 32xbgr. 
+Fix pixel-to-colour alpha blending in plotter for 32xbgr.
 
 No HTTPS (Half of the world uses it....Damn PolarSSL..)
 
@@ -137,3 +137,5 @@ The caching can be enabled later when everything else is Working 100%.
 Might crash randomly because of some malloc/free issues after an HTTP POST.
 
 No Javascript.
+
+Weird symbols appear in the address bar when pressing Home or End keys or other keys.
