@@ -46,6 +46,18 @@ nserror url_unescape(const char *str, char **result)
 	retstr = strdup(curlstr);
 
 	/* free crashes for favicon.png.. */
+
+	int val;
+	__asm__ __volatile__(
+			     "int $0x40"
+			     :"=a"(val)
+			     :"a"(68),"b"(13),"c"(curlstr));
+
+	if(val != 1) {
+	  debug_board_write_str("Failed to free block with SF 68,13\n");
+	  __asm__ __volatile__("int3");
+	}
+	
 	/* free(curlstr); */
 	/* FIXME: Investigate why free crashes for only that string and enable it
 	   Otherwise we might run out of mem completely when we run for a long time */
